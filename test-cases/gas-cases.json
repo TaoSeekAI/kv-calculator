@@ -1,0 +1,72 @@
+{
+  "cases": [
+    {
+      "name": "气体-空气-常规工况",
+      "fluidType": "气体",
+      "Qn": 5000,
+      "P1": 0.6,
+      "P2": 0.1,
+      "pressureUnit": "MPa(G)",
+      "temperature": 20,
+      "density": 1.293,
+      "densityUnit": "Kg/Nm3",
+      "M": 29,
+      "gamma": 1.4,
+      "DN": 100,
+      "FL": 0.9,
+      "XT": 0.72,
+      "ratedKv": 250
+    },
+    {
+      "name": "气体-空气-高压差",
+      "fluidType": "气体",
+      "Qn": 3000,
+      "P1": 1.0,
+      "P2": 0.2,
+      "pressureUnit": "MPa(G)",
+      "temperature": 50,
+      "density": 1.293,
+      "densityUnit": "Kg/Nm3",
+      "M": 29,
+      "gamma": 1.4,
+      "DN": 80,
+      "FL": 0.85,
+      "XT": 0.68,
+      "ratedKv": 160
+    },
+    {
+      "name": "气体-氮气",
+      "fluidType": "气体",
+      "Qn": 2000,
+      "P1": 0.8,
+      "P2": 0.3,
+      "pressureUnit": "MPa(G)",
+      "temperature": 30,
+      "density": 1.251,
+      "densityUnit": "Kg/Nm3",
+      "M": 28,
+      "gamma": 1.4,
+      "DN": 80,
+      "FL": 0.9,
+      "XT": 0.72,
+      "ratedKv": 160
+    },
+    {
+      "name": "气体-天然气",
+      "fluidType": "气体",
+      "Qn": 10000,
+      "P1": 1.5,
+      "P2": 0.5,
+      "pressureUnit": "MPa(G)",
+      "temperature": 25,
+      "density": 0.72,
+      "densityUnit": "Kg/Nm3",
+      "M": 18,
+      "gamma": 1.3,
+      "DN": 150,
+      "FL": 0.85,
+      "XT": 0.70,
+      "ratedKv": 400
+    }
+  ]
+}

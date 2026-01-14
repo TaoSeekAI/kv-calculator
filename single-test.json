@@ -1,0 +1,16 @@
+{
+  "cases": [
+    {
+      "name": "您的测试数据",
+      "fluidType": "liquid",
+      "Q": 80,
+      "P1": 1.5,
+      "P2": 0.2,
+      "temperature": 40,
+      "density": 995,
+      "DN": 100,
+      "FL": 0.85,
+      "ratedKv": 250
+    }
+  ]
+}

@@ -1,0 +1,190 @@
+{
+  "timestamp": "2026-01-14T07:38:49.919Z",
+  "totalCases": 6,
+  "results": [
+    {
+      "name": "液体-水-常规",
+      "input": {
+        "name": "液体-水-常规",
+        "fluidType": "液体",
+        "Q": 80,
+        "P1": 1.5,
+        "P2": 0.2,
+        "pressureUnit": "MPa(G)",
+        "temperature": 40,
+        "density": 995,
+        "densityUnit": "Kg/m3",
+        "viscosity": 0.8,
+        "DN": 100,
+        "FL": 0.85,
+        "ratedKv": 250
+      },
+      "output": {
+        "calculatedKv": 23.52222401917794,
+        "calculatedCv": 27.1916909661697,
+        "valveOpening": 39.58329904031286,
+        "flowState": "阻塞流",
+        "turbulenceState": "紊流",
+        "fluidState": "空化",
+        "outletVelocity": 2.8294212105225838,
+        "usedFormula": "C3",
+        "noiseLevel": 74.2,
+        "noiseFlowState": "恒定空化"
+      }
+    },
+    {
+      "name": "液体-水-高压差",
+      "input": {
+        "name": "液体-水-高压差",
+        "fluidType": "液体",
+        "Q": 100,
+        "P1": 2,
+        "P2": 0.1,
+        "pressureUnit": "MPa(G)",
+        "temperature": 50,
+        "density": 988,
+        "densityUnit": "Kg/m3",
+        "DN": 150,
+        "FL": 0.9,
+        "ratedKv": 400
+      },
+      "output": {
+        "calculatedKv": 24.168240846874678,
+        "calculatedCv": 27.938486418987125,
+        "valveOpening": 28.261537990664998,
+        "flowState": "阻塞流",
+        "turbulenceState": "紊流",
+        "fluidState": "空化",
+        "outletVelocity": 1.5719006725125464,
+        "usedFormula": "C3",
+        "noiseLevel": 73.8,
+        "noiseFlowState": "恒定空化"
+      }
+    },
+    {
+      "name": "气体-空气",
+      "input": {
+        "name": "气体-空气",
+        "fluidType": "气体",
+        "Qn": 5000,
+        "P1": 0.6,
+        "P2": 0.1,
+        "pressureUnit": "MPa(G)",
+        "temperature": 20,
+        "density": 1.293,
+        "densityUnit": "Kg/Nm3",
+        "M": 29,
+        "gamma": 1.4,
+        "DN": 100,
+        "FL": 0.9,
+        "XT": 0.72,
+        "ratedKv": 250
+      },
+      "output": {
+        "calculatedKv": 223.99592164919065,
+        "calculatedCv": 258.9392854264644,
+        "valveOpening": 97.19242261756101,
+        "flowState": "非阻塞流",
+        "turbulenceState": "紊流",
+        "outletVelocity": 96.15080677213787,
+        "usedFormula": "气体非阻塞流无接管",
+        "noiseLevel": 100.9,
+        "noiseFlowState": "State III (临界流)"
+      },
+      "warnings": [
+        "开度大于90%，建议选择更大口径阀门"
+      ]
+    },
+    {
+      "name": "气体-天然气",
+      "input": {
+        "name": "气体-天然气",
+        "fluidType": "气体",
+        "Qn": 10000,
+        "P1": 1.5,
+        "P2": 0.5,
+        "pressureUnit": "MPa(G)",
+        "temperature": 25,
+        "density": 0.72,
+        "densityUnit": "Kg/Nm3",
+        "M": 18,
+        "gamma": 1.3,
+        "DN": 150,
+        "FL": 0.85,
+        "XT": 0.7,
+        "ratedKv": 400
+      },
+      "output": {
+        "calculatedKv": 163.98393484002935,
+        "calculatedCv": 189.56542867507392,
+        "valveOpening": 77.20626690749933,
+        "flowState": "非阻塞流",
+        "turbulenceState": "紊流",
+        "outletVelocity": 28.97504176384271,
+        "usedFormula": "气体非阻塞流无接管",
+        "noiseLevel": 94.2,
+        "noiseFlowState": "State III (临界流)"
+      }
+    },
+    {
+      "name": "蒸汽-饱和",
+      "input": {
+        "name": "蒸汽-饱和",
+        "fluidType": "蒸汽",
+        "W": 2000,
+        "P1": 1,
+        "P2": 0.5,
+        "pressureUnit": "MPa(G)",
+        "temperature": 200,
+        "density": 5.15,
+        "densityUnit": "Kg/m3",
+        "gamma": 1.3,
+        "DN": 80,
+        "FL": 0.9,
+        "XT": 0.72,
+        "ratedKv": 160
+      },
+      "output": {
+        "calculatedKv": 16.127397657389913,
+        "calculatedCv": 18.64327169194274,
+        "valveOpening": 41.34353840735536,
+        "flowState": "非阻塞流",
+        "turbulenceState": "紊流",
+        "outletVelocity": 21.461022531269595,
+        "usedFormula": "蒸汽非阻塞流无接管",
+        "noiseLevel": 80,
+        "noiseFlowState": "State III (临界流)"
+      }
+    },
+    {
+      "name": "蒸汽-过热",
+      "input": {
+        "name": "蒸汽-过热",
+        "fluidType": "蒸汽",
+        "W": 5000,
+        "P1": 2,
+        "P2": 0.8,
+        "pressureUnit": "MPa(G)",
+        "temperature": 300,
+        "density": 8.5,
+        "densityUnit": "Kg/m3",
+        "gamma": 1.3,
+        "DN": 100,
+        "FL": 0.85,
+        "XT": 0.7,
+        "ratedKv": 250
+      },
+      "output": {
+        "calculatedKv": 22.160939794109666,
+        "calculatedCv": 25.61804640199077,
+        "valveOpening": 38.0594223490324,
+        "flowState": "非阻塞流",
+        "turbulenceState": "紊流",
+        "outletVelocity": 20.80456772443076,
+        "usedFormula": "蒸汽非阻塞流无接管",
+        "noiseLevel": 81.3,
+        "noiseFlowState": "State III (临界流)"
+      }
+    }
+  ]
+}

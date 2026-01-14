@@ -1,0 +1,72 @@
+{
+  "cases": [
+    {
+      "name": "液体测试-水",
+      "fluidType": "liquid",
+      "Q": 80,
+      "P1": 1.5,
+      "P2": 0.2,
+      "temperature": 40,
+      "density": 995,
+      "viscosity": 0.8,
+      "DN": 100,
+      "FL": 0.85,
+      "Fd": 0.46,
+      "ratedKv": 250,
+      "rangeability": 50
+    },
+    {
+      "name": "液体测试-高压",
+      "fluidType": "liquid",
+      "Q": 100,
+      "P1": 2.0,
+      "P2": 0.1,
+      "temperature": 50,
+      "density": 988,
+      "DN": 150,
+      "FL": 0.9,
+      "ratedKv": 400
+    },
+    {
+      "name": "气体测试-空气",
+      "fluidType": "gas",
+      "Qn": 5000,
+      "P1": 0.6,
+      "P2": 0.1,
+      "temperature": 20,
+      "density": 1.293,
+      "M": 29,
+      "gamma": 1.4,
+      "DN": 100,
+      "FL": 0.9,
+      "XT": 0.72,
+      "ratedKv": 250
+    },
+    {
+      "name": "蒸汽测试",
+      "fluidType": "steam",
+      "W": 2000,
+      "P1": 1.0,
+      "P2": 0.5,
+      "temperature": 200,
+      "density": 5.15,
+      "gamma": 1.3,
+      "DN": 80,
+      "FL": 0.9,
+      "XT": 0.72,
+      "ratedKv": 160
+    },
+    {
+      "name": "小流量液体",
+      "fluidType": "liquid",
+      "Q": 10,
+      "P1": 0.5,
+      "P2": 0.1,
+      "temperature": 25,
+      "density": 1000,
+      "DN": 50,
+      "FL": 0.9,
+      "ratedKv": 63
+    }
+  ]
+}

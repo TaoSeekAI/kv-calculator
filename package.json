@@ -1,0 +1,44 @@
+{
+  "name": "kv-calculator",
+  "version": "1.0.0",
+  "description": "控制阀流量系数(Kv/Cv)计算系统",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "start": "bun src/index.ts",
+    "compare": "bun test/excel-comparator.ts",
+    "test": "bun test/noise-test.ts",
+    "test:random": "bun test/random-verify.ts",
+    "test:detail": "bun test/detailed-verification.ts",
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "calc": "bun cli/batch-calculate.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": ["kv", "cv", "valve", "flow-coefficient"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.11.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "xlsx": "^0.18.5"
+  }
+}

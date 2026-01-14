@@ -1,0 +1,51 @@
+{
+  "cases": [
+    {
+      "name": "液体-水-常规工况",
+      "fluidType": "液体",
+      "Q": 80,
+      "P1": 1.5,
+      "P2": 0.2,
+      "pressureUnit": "MPa(G)",
+      "temperature": 40,
+      "tempUnit": "℃",
+      "density": 995,
+      "densityUnit": "Kg/m3",
+      "viscosity": 0.8,
+      "DN": 100,
+      "FL": 0.85,
+      "Fd": 0.46,
+      "ratedKv": 250,
+      "flowChar": "等百分比",
+      "rangeability": 50
+    },
+    {
+      "name": "液体-水-高压差",
+      "fluidType": "液体",
+      "Q": 100,
+      "P1": 2.0,
+      "P2": 0.1,
+      "pressureUnit": "MPa(G)",
+      "temperature": 50,
+      "density": 988,
+      "densityUnit": "Kg/m3",
+      "DN": 150,
+      "FL": 0.9,
+      "ratedKv": 400
+    },
+    {
+      "name": "液体-水-小流量",
+      "fluidType": "液体",
+      "Q": 10,
+      "P1": 0.5,
+      "P2": 0.1,
+      "pressureUnit": "MPa(G)",
+      "temperature": 25,
+      "density": 1000,
+      "densityUnit": "Kg/m3",
+      "DN": 50,
+      "FL": 0.9,
+      "ratedKv": 63
+    }
+  ]
+}

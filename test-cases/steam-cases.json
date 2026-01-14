@@ -1,0 +1,52 @@
+{
+  "cases": [
+    {
+      "name": "蒸汽-饱和蒸汽",
+      "fluidType": "蒸汽",
+      "W": 2000,
+      "P1": 1.0,
+      "P2": 0.5,
+      "pressureUnit": "MPa(G)",
+      "temperature": 200,
+      "density": 5.15,
+      "densityUnit": "Kg/m3",
+      "gamma": 1.3,
+      "DN": 80,
+      "FL": 0.9,
+      "XT": 0.72,
+      "ratedKv": 160
+    },
+    {
+      "name": "蒸汽-过热蒸汽",
+      "fluidType": "蒸汽",
+      "W": 5000,
+      "P1": 2.0,
+      "P2": 0.8,
+      "pressureUnit": "MPa(G)",
+      "temperature": 300,
+      "density": 8.5,
+      "densityUnit": "Kg/m3",
+      "gamma": 1.3,
+      "DN": 100,
+      "FL": 0.85,
+      "XT": 0.70,
+      "ratedKv": 250
+    },
+    {
+      "name": "蒸汽-低压蒸汽",
+      "fluidType": "蒸汽",
+      "W": 500,
+      "P1": 0.3,
+      "P2": 0.05,
+      "pressureUnit": "MPa(G)",
+      "temperature": 150,
+      "density": 2.0,
+      "densityUnit": "Kg/m3",
+      "gamma": 1.3,
+      "DN": 50,
+      "FL": 0.9,
+      "XT": 0.72,
+      "ratedKv": 63
+    }
+  ]
+}

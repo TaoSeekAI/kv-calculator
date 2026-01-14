@@ -1,0 +1,54 @@
+{
+  "cases": [
+    {
+      "name": "温度50K测试(会自动识别为℃)",
+      "fluidType": "liquid",
+      "Q": 80,
+      "P1": 1.5,
+      "P2": 0.2,
+      "temperature": 50,
+      "density": 995,
+      "DN": 100,
+      "FL": 0.85,
+      "ratedKv": 250
+    },
+    {
+      "name": "温度323K测试(会自动识别为K)",
+      "fluidType": "liquid",
+      "Q": 80,
+      "P1": 1.5,
+      "P2": 0.2,
+      "temperature": 323,
+      "density": 995,
+      "DN": 100,
+      "FL": 0.85,
+      "ratedKv": 250
+    },
+    {
+      "name": "明确指定℃单位",
+      "fluidType": "liquid",
+      "Q": 80,
+      "P1": 1.5,
+      "P2": 0.2,
+      "temperature": 50,
+      "tempUnit": "℃",
+      "density": 995,
+      "DN": 100,
+      "FL": 0.85,
+      "ratedKv": 250
+    },
+    {
+      "name": "明确指定K单位",
+      "fluidType": "liquid",
+      "Q": 80,
+      "P1": 1.5,
+      "P2": 0.2,
+      "temperature": 323,
+      "tempUnit": "K",
+      "density": 995,
+      "DN": 100,
+      "FL": 0.85,
+      "ratedKv": 250
+    }
+  ]
+}

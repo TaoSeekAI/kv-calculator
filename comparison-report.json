@@ -1,0 +1,175 @@
+{
+  "timestamp": "2026-01-14T06:21:21.794Z",
+  "sheetName": "Kv计算",
+  "fluidType": "液体",
+  "summary": {
+    "total": 18,
+    "passed": 17,
+    "failed": 1,
+    "passRate": "94.44%"
+  },
+  "details": [
+    {
+      "field": "P1Abs",
+      "description": "P1绝对压力(KPa)",
+      "excelValue": 2100,
+      "calculatedValue": 2100,
+      "difference": 0,
+      "percentError": 0,
+      "passed": true
+    },
+    {
+      "field": "P2Abs",
+      "description": "P2绝对压力(KPa)",
+      "excelValue": 200,
+      "calculatedValue": 200,
+      "difference": 0,
+      "percentError": 0,
+      "passed": true
+    },
+    {
+      "field": "deltaP",
+      "description": "压差ΔP(KPa)",
+      "excelValue": 1900,
+      "calculatedValue": 1900,
+      "difference": 0,
+      "percentError": 0,
+      "passed": true
+    },
+    {
+      "field": "T1",
+      "description": "入口绝对温度T1(K)",
+      "excelValue": 323.15,
+      "calculatedValue": 323.15,
+      "difference": 0,
+      "percentError": 0,
+      "passed": true
+    },
+    {
+      "field": "relativeDensity",
+      "description": "相对密度",
+      "excelValue": 0.988,
+      "calculatedValue": 0.988,
+      "difference": 0,
+      "percentError": 0,
+      "passed": true
+    },
+    {
+      "field": "Pv",
+      "description": "饱和蒸汽压Pv(KPa)",
+      "excelValue": 12.3276952603035,
+      "calculatedValue": 12.327695260303528,
+      "difference": 2.842170943040401e-14,
+      "percentError": 2.305516873208649e-13,
+      "passed": true
+    },
+    {
+      "field": "FF",
+      "description": "FF系数",
+      "excelValue": 0.953389924574929,
+      "calculatedValue": 0.9533899245749291,
+      "difference": 1.1102230246251565e-16,
+      "percentError": 1.1645004798222007e-14,
+      "passed": true
+    },
+    {
+      "field": "D1",
+      "description": "D1内径(mm)",
+      "excelValue": 150,
+      "calculatedValue": 150,
+      "difference": 0,
+      "percentError": 0,
+      "passed": true
+    },
+    {
+      "field": "D2",
+      "description": "D2内径(mm)",
+      "excelValue": 150,
+      "calculatedValue": 150,
+      "difference": 0,
+      "percentError": 0,
+      "passed": true
+    },
+    {
+      "field": "FP",
+      "description": "FP",
+      "excelValue": 1,
+      "calculatedValue": 1,
+      "difference": 0,
+      "percentError": 0,
+      "passed": true
+    },
+    {
+      "field": "FLP",
+      "description": "FLP",
+      "excelValue": 0.9,
+      "calculatedValue": 0.9,
+      "difference": 0,
+      "percentError": 0,
+      "passed": true
+    },
+    {
+      "field": "sumK",
+      "description": "ΣK",
+      "excelValue": 0,
+      "calculatedValue": 0,
+      "difference": 0,
+      "percentError": 0,
+      "passed": true
+    },
+    {
+      "field": "Rev",
+      "description": "雷诺数Rev",
+      "excelValue": 629137.067512484,
+      "calculatedValue": 647679.2771114083,
+      "difference": 18542.209598924266,
+      "percentError": 2.94724481458984,
+      "passed": false
+    },
+    {
+      "field": "FR",
+      "description": "FR",
+      "excelValue": 1,
+      "calculatedValue": 1,
+      "difference": 0,
+      "percentError": 0,
+      "passed": true
+    },
+    {
+      "field": "calculatedKv",
+      "description": "计算Kv",
+      "excelValue": 24.1682408468747,
+      "calculatedValue": 24.168240846874678,
+      "difference": 2.1316282072803006e-14,
+      "percentError": 8.819955994256615e-14,
+      "passed": true
+    },
+    {
+      "field": "valveOpening",
+      "description": "阀门开度(%)",
+      "excelValue": 28.261537990665,
+      "calculatedValue": 28.261537990664998,
+      "difference": 3.552713678800501e-15,
+      "percentError": 1.2570843384298438e-14,
+      "passed": true
+    },
+    {
+      "field": "volumeFlow",
+      "description": "体积流量(m3/h)",
+      "excelValue": 100,
+      "calculatedValue": 100,
+      "difference": 0,
+      "percentError": 0,
+      "passed": true
+    },
+    {
+      "field": "massFlow",
+      "description": "质量流量(Kg/h)",
+      "excelValue": 98800,
+      "calculatedValue": 98800,
+      "difference": 0,
+      "percentError": 0,
+      "passed": true
+    }
+  ]
+}
