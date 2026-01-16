@@ -4,9 +4,11 @@
 export * from './types/index.js';
 export * from './constants/index.js';
 export * from './utils/unit-converter.js';
+export { getPipeSpec, getAvailableSchStandards } from './utils/pipe-spec-static.js';
 export * from './calculators/liquid.js';
 export * from './calculators/gas.js';
 export * from './calculators/steam.js';
 export * from './calculators/reynolds.js';
 export * from './calculators/valve-opening.js';
 export { KvCalculator, kvCalculator } from './kv-calculator.js';
+export * from './data/actuator-data.js';
