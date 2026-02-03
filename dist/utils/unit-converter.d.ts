@@ -1,91 +1,91 @@
 /**
- * 单位转换工具
+ * Unit Conversion Utilities
  */
 import type { PressureUnit, TemperatureUnit, FlowUnit, DensityUnit, ViscosityUnit, ViscosityType } from '../types/index.js';
 /**
- * 压力转换 - 转为绝对压力 KPa
+ * Pressure conversion - Convert to absolute pressure KPa
  */
 export declare function convertPressureToKPaAbs(value: number, unit: PressureUnit): number;
 /**
- * 温度转换 - 转为开尔文 K
+ * Temperature conversion - Convert to Kelvin K
  */
 export declare function convertTemperatureToK(value: number, unit: TemperatureUnit): number;
 /**
- * 温度转换 - 转为摄氏度 ℃
+ * Temperature conversion - Convert to Celsius ℃
  */
 export declare function convertTemperatureToCelsius(value: number, unit: TemperatureUnit): number;
 /**
- * 密度转换 - 转为 Kg/m³
+ * Density conversion - Convert to Kg/m³
  */
 export declare function convertDensityToKgM3(value: number, unit: DensityUnit): number;
 /**
- * 气体密度转换 - 标准状态到实际状态
- * @param rhoN 标准状态密度 Kg/Nm³
- * @param P1 绝对压力 KPa
- * @param T1 绝对温度 K
- * @returns 实际密度 Kg/m³
+ * Gas density conversion - Standard state to actual state
+ * @param rhoN Standard state density Kg/Nm³
+ * @param P1 Absolute pressure KPa
+ * @param T1 Absolute temperature K
+ * @returns Actual density Kg/m³
  */
 export declare function convertGasDensityToActual(rhoN: number, P1: number, T1: number): number;
 /**
- * 粘度转换 - 转为运动粘度 m²/s
- * @param value 粘度值
- * @param unit 粘度单位
- * @param type 粘度类型
- * @param density 密度 kg/m³ (动力粘度转换需要)
+ * Viscosity conversion - Convert to kinematic viscosity m²/s
+ * @param value Viscosity value
+ * @param unit Viscosity unit
+ * @param type Viscosity type
+ * @param density Density kg/m³ (required for dynamic viscosity conversion)
  */
 export declare function convertViscosityToM2S(value: number, unit: ViscosityUnit, type: ViscosityType, density: number): number;
 /**
- * 液体体积流量转换 - 转为 m³/h
+ * Liquid volume flow rate conversion - Convert to m³/h
  */
 export declare function convertLiquidFlowToM3h(value: number, unit: FlowUnit, density: number): number;
 /**
- * 气体标准体积流量转换 - 转为 Nm³/h
+ * Gas standard volume flow rate conversion - Convert to Nm³/h
  */
-export declare function convertGasFlowToNm3h(value: number, unit: FlowUnit, rhoN: number, // 标准状态密度 Kg/Nm³
-P1: number, // 绝对压力 KPa
+export declare function convertGasFlowToNm3h(value: number, unit: FlowUnit, rhoN: number, // Standard state density Kg/Nm³
+P1: number, // Absolute pressure KPa
 T1: number): number;
 /**
- * 蒸汽质量流量转换 - 转为 Kg/h
+ * Steam mass flow rate conversion - Convert to Kg/h
  */
 export declare function convertSteamFlowToKgh(value: number, unit: FlowUnit, density: number): number;
 /**
- * 计算管道内径
- * @param outerDiameter 外径 mm
- * @param wallThickness 壁厚 mm
+ * Calculate pipe inner diameter
+ * @param outerDiameter Outer diameter mm
+ * @param wallThickness Wall thickness mm
  */
 export declare function calcInnerDiameter(outerDiameter: number, wallThickness: number): number;
 /**
- * 获取管道内径（自动查表或计算）
+ * Get pipe inner diameter (auto lookup or calculate)
  */
 export declare function getPipeInnerDiameter(dn: number, outerDiameter?: number, wallThickness?: number): number;
 /**
- * Kv 转 Cv
+ * Kv to Cv conversion
  */
 export declare function kvToCv(kv: number): number;
 /**
- * Cv 转 Kv
+ * Cv to Kv conversion
  */
 export declare function cvToKv(cv: number): number;
 /**
- * 计算相对密度（比重）
+ * Calculate relative density (specific gravity)
  */
 export declare function calcRelativeDensity(density: number): number;
 /**
- * 计算饱和蒸汽压（安托因方程，水）
- * @param tempCelsius 温度 ℃
- * @returns 饱和蒸汽压 KPa
+ * Calculate saturation vapor pressure (Antoine equation, water)
+ * @param tempCelsius Temperature ℃
+ * @returns Saturation vapor pressure KPa
  */
 export declare function calcSaturationPressure(tempCelsius: number): number;
 /**
- * 计算饱和温度（安托因方程反算，水）
- * @param pressureKPa 绝对压力 KPa
- * @returns 饱和温度 ℃
+ * Calculate saturation temperature (inverse Antoine equation, water)
+ * @param pressureKPa Absolute pressure KPa
+ * @returns Saturation temperature ℃
  */
 export declare function calcSaturationTemperature(pressureKPa: number): number;
 /**
- * 出口流速计算
- * @param flowM3h 体积流量 m³/h
- * @param diameterMm 管道内径 mm
- * @returns 流速 m/s
+ * Outlet velocity calculation
+ * @param flowM3h Volume flow rate m³/h
+ * @param diameterMm Pipe inner diameter mm
+ * @returns Velocity m/s
  */
 export declare function calcVelocity(flowM3h: number, diameterMm: number): number;

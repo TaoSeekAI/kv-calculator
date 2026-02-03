@@ -1,19 +1,19 @@
 /**
- * Kv计算系统类型定义
+ * Kv Calculation System Type Definitions
  */
 
-// 流体类型
+// Fluid Type
 export type FluidType =
-  | '液体'
-  | '气体'
-  | '蒸汽'
-  | '两相流(液体+气体)'
-  | '两相流(液体+蒸汽)';
+  | 'Liquid'
+  | 'Gas'
+  | 'Steam'
+  | 'Two-phase (Liquid+Gas)'
+  | 'Two-phase (Liquid+Steam)';
 
-// 流量特性
-export type FlowCharacteristic = '等百分比' | '线性' | '快开';
+// Flow Characteristic
+export type FlowCharacteristic = 'Equal Percentage' | 'Linear' | 'Quick Opening';
 
-// 压力单位
+// Pressure Unit
 export type PressureUnit =
   | 'MPa(G)'
   | 'MPa(A)'
@@ -22,10 +22,10 @@ export type PressureUnit =
   | 'bar(G)'
   | 'bar(A)';
 
-// 温度单位
+// Temperature Unit
 export type TemperatureUnit = '℃' | 'K' | 'F';
 
-// 流量单位
+// Flow Unit
 export type FlowUnit =
   | 'm3/h'
   | 'Kg/h'
@@ -34,201 +34,201 @@ export type FlowUnit =
   | 't/s'
   | 'Nm3/h';
 
-// 密度单位
+// Density Unit
 export type DensityUnit = 'Kg/m3' | 'g/cm3' | 'Kg/Nm3';
 
-// 粘度单位
+// Viscosity Unit
 export type ViscosityUnit = 'm2/s' | 'mm2/s' | 'St' | 'cSt' | 'cP' | 'Pa.S' | 'mPa.S';
 
-// 粘度类型
-export type ViscosityType = '运动粘度 v' | '动力粘度 u' | '粘度';
+// Viscosity Type
+export type ViscosityType = 'Kinematic Viscosity' | 'Dynamic Viscosity' | 'Viscosity';
 
-// 流动状态
-export type FlowState = '阻塞流' | '非阻塞流';
+// Flow State
+export type FlowState = 'Choked' | 'Non-choked';
 
-// 紊流状态
-export type TurbulenceState = '紊流' | '非紊流';
+// Turbulence State
+export type TurbulenceState = 'Turbulent' | 'Laminar';
 
-// 液体状态
-export type FluidState = '无气蚀' | '初始气蚀' | '空化' | '闪蒸';
+// Fluid State (for liquids)
+export type FluidState = 'No Cavitation' | 'Incipient Cavitation' | 'Cavitation' | 'Flashing';
 
-// 阀内件形式
-export type ValveInternalsType = '标准型' | '多级降压';
+// Valve Internals Type
+export type ValveInternalsType = 'Standard' | 'Multi-stage Pressure Reduction';
 
 /**
- * Kv计算输入参数
+ * Kv Calculation Input Parameters
  */
 export interface KvInput {
-  // 流体属性
+  // Fluid properties
   fluidType: FluidType;
 
-  // 温度参数
+  // Temperature parameters
   temperature: number;
   tempUnit: TemperatureUnit;
 
-  // 流量参数
+  // Flow parameters
   flowRate: number;
   flowUnit: FlowUnit;
 
-  // 两相流气体/蒸汽流量
+  // Two-phase gas/steam flow rate
   gasFlowRate?: number;
   gasFlowUnit?: FlowUnit;
 
-  // 压力参数
-  P1: number;               // 阀前压力
-  P2: number;               // 阀后压力
+  // Pressure parameters
+  P1: number;               // Inlet pressure
+  P2: number;               // Outlet pressure
   pressureUnit: PressureUnit;
 
-  // 密度参数
-  density: number;          // 主密度(液体/气体/蒸汽)
+  // Density parameters
+  density: number;          // Primary density (liquid/gas/steam)
   densityUnit: DensityUnit;
-  gasDensity?: number;      // 两相流气体密度
+  gasDensity?: number;      // Two-phase gas density
   gasDensityUnit?: DensityUnit;
 
-  // 粘度参数
+  // Viscosity parameters
   viscosity?: number;
   viscosityUnit?: ViscosityUnit;
   viscosityType?: ViscosityType;
 
-  // 气体特有参数
-  molecularWeight?: number; // 分子量 M
-  Z?: number;               // 压缩系数
-  gamma?: number;           // 比热比 γ
+  // Gas-specific parameters
+  molecularWeight?: number; // Molecular weight M
+  Z?: number;               // Compressibility factor
+  gamma?: number;           // Specific heat ratio γ
 
-  // 临界参数(液体)
-  Pc?: number;              // 临界压力 MPa
+  // Critical parameters (liquid)
+  Pc?: number;              // Critical pressure MPa
 
-  // 阀门参数
-  DN: number;               // 阀门口径 mm
-  seatSize?: number;        // 阀芯/阀座尺寸 mm
-  FL: number;               // 压力恢复系数
-  XT?: number;              // 压差比系数
-  Fd?: number;              // 控制阀类型修正系数
+  // Valve parameters
+  DN: number;               // Valve nominal diameter mm
+  seatSize?: number;        // Valve seat size mm
+  FL: number;               // Pressure recovery factor
+  XT?: number;              // Pressure differential ratio factor
+  Fd?: number;              // Valve style modifier
 
-  // 流量特性
+  // Flow characteristic
   flowChar: FlowCharacteristic;
-  rangeability: number;     // 固有可调比 R
-  ratedKv: number;          // 额定Kv
+  rangeability: number;     // Inherent rangeability R
+  ratedKv: number;          // Rated Kv
 
-  // 管道参数
-  D1w?: number;             // 上游管道外径 mm
-  D1T?: number;             // 上游管道壁厚 mm
-  D2w?: number;             // 下游管道外径 mm
-  D2T?: number;             // 下游管道壁厚 mm
+  // Piping parameters
+  D1w?: number;             // Upstream pipe outer diameter mm
+  D1T?: number;             // Upstream pipe wall thickness mm
+  D2w?: number;             // Downstream pipe outer diameter mm
+  D2T?: number;             // Downstream pipe wall thickness mm
 
-  // 阀内件形式
+  // Valve internals type
   valveInternalsType?: ValveInternalsType;
 }
 
 /**
- * 中间计算值
+ * Intermediate Calculation Values
  */
 export interface IntermediateValues {
-  // 压力转换
-  P1Abs: number;            // P1绝对压力 KPa
-  P2Abs: number;            // P2绝对压力 KPa
-  deltaP: number;           // 压差 KPa
+  // Pressure conversion
+  P1Abs: number;            // P1 absolute pressure KPa
+  P2Abs: number;            // P2 absolute pressure KPa
+  deltaP: number;           // Pressure differential KPa
 
-  // 温度转换
-  T1: number;               // 入口绝对温度 K
-  saturationTemp?: number;  // 饱和温度 ℃
+  // Temperature conversion
+  T1: number;               // Inlet absolute temperature K
+  saturationTemp?: number;  // Saturation temperature ℃
 
-  // 密度转换
-  densityKgM3: number;      // 统一密度 Kg/m3
-  relativeDensity?: number; // 相对密度
+  // Density conversion
+  densityKgM3: number;      // Unified density Kg/m3
+  relativeDensity?: number; // Relative density
 
-  // 流量转换
-  volumeFlowM3h?: number;   // 体积流量 m³/h
-  massFlowKgh?: number;     // 质量流量 Kg/h
-  normalFlowNm3h?: number;  // 标准流量 Nm³/h
+  // Flow conversion
+  volumeFlowM3h?: number;   // Volume flow rate m³/h
+  massFlowKgh?: number;     // Mass flow rate Kg/h
+  normalFlowNm3h?: number;  // Standard flow rate Nm³/h
 
-  // 粘度转换
-  kinematicViscosity?: number; // 运动粘度 m²/s
+  // Viscosity conversion
+  kinematicViscosity?: number; // Kinematic viscosity m²/s
 
-  // 液体特有
-  Pv?: number;              // 饱和蒸汽压 KPa
-  FF?: number;              // 临界压力比系数
-  xF?: number;              // 压差比
+  // Liquid-specific
+  Pv?: number;              // Vapor pressure KPa
+  FF?: number;              // Critical pressure ratio factor
+  xF?: number;              // Pressure differential ratio
 
-  // 气体特有
-  x?: number;               // 压差比 ΔP/P1
-  Fgamma?: number;          // 比热比系数 γ/1.4
-  Y?: number;               // 膨胀系数
+  // Gas-specific
+  x?: number;               // Pressure ratio ΔP/P1
+  Fgamma?: number;          // Specific heat ratio factor γ/1.4
+  Y?: number;               // Expansion factor
 
-  // 管道系数
-  D1?: number;              // 上游管道内径 mm
-  D2?: number;              // 下游管道内径 mm
-  FP: number;               // 管道几何形状系数
-  FLP: number;              // 复合系数
-  sumK: number;             // 管件阻力系数和
+  // Piping coefficients
+  D1?: number;              // Upstream pipe inner diameter mm
+  D2?: number;              // Downstream pipe inner diameter mm
+  FP: number;               // Piping geometry factor
+  FLP: number;              // Combined liquid pressure recovery factor
+  sumK: number;             // Sum of resistance coefficients
 
-  // 雷诺数相关
-  Rev: number;              // 阀门雷诺数
-  FR: number;               // 雷诺数修正系数
-  lambda: number;           // λ系数
+  // Reynolds number related
+  Rev: number;              // Valve Reynolds number
+  FR: number;               // Reynolds number factor
+  lambda: number;           // λ coefficient
 
-  // 液体Kv各公式结果
-  C1?: number;              // 非阻塞流，无接管
-  C2?: number;              // 非阻塞流，带接管
-  C3?: number;              // 阻塞流，无接管
-  C4?: number;              // 阻塞流，带接管
-  C5?: number;              // 非紊流
+  // Liquid Kv formula results
+  C1?: number;              // Non-choked, without fittings
+  C2?: number;              // Non-choked, with fittings
+  C3?: number;              // Choked, without fittings
+  C4?: number;              // Choked, with fittings
+  C5?: number;              // Non-turbulent (laminar)
 
-  // 流动状态判定
-  flowStateNoFitting?: FlowState;    // 无接管流动状态
-  flowStateWithFitting?: FlowState;  // 带接管流动状态
+  // Flow state determination
+  flowStateNoFitting?: FlowState;    // Flow state without fittings
+  flowStateWithFitting?: FlowState;  // Flow state with fittings
 }
 
 /**
- * Kv计算结果
+ * Kv Calculation Result
  */
 export interface KvResult {
-  // 主要结果
-  calculatedKv: number;     // 计算Kv
-  calculatedCv: number;     // 计算Cv
-  valveOpening: number;     // 阀门开度 %
+  // Main results
+  calculatedKv: number;     // Calculated Kv
+  calculatedCv: number;     // Calculated Cv
+  valveOpening: number;     // Valve opening %
 
-  // 流动状态
-  flowState: FlowState;           // 流动状态
-  turbulenceState: TurbulenceState; // 紊流状态
-  fluidState?: FluidState;        // 流体状态(液体)
+  // Flow state
+  flowState: FlowState;           // Flow state
+  turbulenceState: TurbulenceState; // Turbulence state
+  fluidState?: FluidState;        // Fluid state (liquid)
 
-  // 速度
-  outletVelocity: number;   // 出口流速 m/s
-  machNumber?: number;      // 马赫数(气体)
+  // Velocity
+  outletVelocity: number;   // Outlet velocity m/s
+  machNumber?: number;      // Mach number (gas)
 
-  // 噪音(后续实现)
-  noise?: number;           // 噪音 dBA
+  // Noise
+  noise?: number;           // Noise level dBA
 
-  // 中间值
+  // Intermediate values
   intermediate: IntermediateValues;
 
-  // 使用的公式
+  // Formula used
   usedFormula: string;
 
-  // 是否有接管件
+  // Has fittings
   hasFittings: boolean;
 
-  // 错误信息
+  // Error messages
   errors?: string[];
   warnings?: string[];
 }
 
 /**
- * Excel比对结果
+ * Excel Comparison Result
  */
 export interface ComparisonResult {
-  field: string;            // 字段名
-  description: string;      // 字段描述
-  excelValue: number;       // Excel值
-  calculatedValue: number;  // 计算值
-  difference: number;       // 差值
-  percentError: number;     // 百分比误差
-  passed: boolean;          // 是否通过
+  field: string;            // Field name
+  description: string;      // Field description
+  excelValue: number;       // Excel value
+  calculatedValue: number;  // Calculated value
+  difference: number;       // Difference
+  percentError: number;     // Percent error
+  passed: boolean;          // Passed or not
 }
 
 /**
- * 比对报告
+ * Comparison Report
  */
 export interface ComparisonReport {
   timestamp: string;

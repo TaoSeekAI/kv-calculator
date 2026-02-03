@@ -29,13 +29,13 @@ export function determineCavitationState(
   const FL2 = FL * FL;
 
   if (xF <= xFz) {
-    return '无空化';
+    return 'No Cavitation';
   } else if (xF <= FL2) {
-    return '初生空化';
+    return 'Incipient Cavitation';
   } else if (xF <= 1) {
-    return '恒定空化';
+    return 'Constant Cavitation';
   } else {
-    return '闪蒸';
+    return 'Flashing';
   }
 }
 
@@ -198,11 +198,11 @@ function calculateSoundPower(
   rw: number,
   cavitationState: CavitationState
 ): number {
-  if (cavitationState === '无空化') {
-    // 纯紊流
+  if (cavitationState === 'No Cavitation') {
+    // Pure turbulent flow
     return etaTurb * Wm;
   } else {
-    // 空化流
+    // Cavitating flow
     return (etaTurb + etaCav) * Wm * rw;
   }
 }
@@ -417,14 +417,14 @@ export function calculateLiquidNoise(input: NoiseInput): NoiseResult {
 
   // 判定空化状态 (E3, E42)
   const cavitationState = determineCavitationState(xF, xFzp, FL);
-  const isCavitation = cavitationState !== '无空化' && cavitationState !== '闪蒸';
+  const isCavitation = cavitationState !== 'No Cavitation' && cavitationState !== 'Flashing';
 
-  // 闪蒸状态不计算噪音
-  if (cavitationState === '闪蒸') {
-    warnings.push('介质发生闪蒸，无法准确计算噪音');
+  // Flashing state - cannot calculate noise
+  if (cavitationState === 'Flashing') {
+    warnings.push('Medium is flashing, noise calculation not accurate');
     return {
       noiseLevel: 0,
-      flowState: '闪蒸',
+      flowState: 'Flashing',
       cavitationState,
       intermediate: {
         deltaPc: 0, Uvc: 0, cL, etaTurb: 0, etaCav: 0, eta: 0,
@@ -503,15 +503,15 @@ export function calculateLiquidNoise(input: NoiseInput): NoiseResult {
   // 限制范围
   noiseLevel = Math.max(NOISE_CONSTANTS.MIN_NOISE, Math.min(NOISE_CONSTANTS.MAX_NOISE, noiseLevel));
 
-  // 添加警告
-  if (cavitationState === '恒定空化') {
-    warnings.push('阀门处于恒定空化状态，可能造成阀门损坏');
+  // Add warnings
+  if (cavitationState === 'Constant Cavitation') {
+    warnings.push('Valve is in constant cavitation state, may cause valve damage');
   }
   if (noiseLevel > 85) {
-    warnings.push(`噪音级 ${noiseLevel.toFixed(1)} dBA 超过85dBA，需要采取降噪措施`);
+    warnings.push(`Noise level ${noiseLevel.toFixed(1)} dBA exceeds 85dBA, noise reduction measures needed`);
   }
   if (Uvc > 30) {
-    warnings.push(`缩流断面流速 ${Uvc.toFixed(1)} m/s 较高，可能引起严重冲蚀`);
+    warnings.push(`Vena contracta velocity ${Uvc.toFixed(1)} m/s is high, may cause severe erosion`);
   }
 
   // 构建中间计算值
@@ -535,7 +535,7 @@ export function calculateLiquidNoise(input: NoiseInput): NoiseResult {
 
   return {
     noiseLevel: Math.round(noiseLevel * 10) / 10,
-    flowState: cavitationState === '无空化' ? '紊流' : cavitationState,
+    flowState: cavitationState === 'No Cavitation' ? 'Turbulent' : cavitationState,
     cavitationState,
     intermediate,
     peakFrequency: Math.round(fpValid),
@@ -544,14 +544,14 @@ export function calculateLiquidNoise(input: NoiseInput): NoiseResult {
 }
 
 /**
- * 获取空化状态描述
+ * Get cavitation state description
  */
 export function getCavitationStateDescription(state: CavitationState): string {
   const descriptions: Record<CavitationState, string> = {
-    '无空化': '压差比低于空化起始点，流动平稳',
-    '初生空化': '开始出现空化气泡，噪音增加',
-    '恒定空化': '稳定空化状态，噪音和振动明显',
-    '闪蒸': '介质汽化，产生严重噪音和振动'
+    'No Cavitation': 'Pressure ratio below cavitation inception, flow is stable',
+    'Incipient Cavitation': 'Cavitation bubbles starting to form, noise increasing',
+    'Constant Cavitation': 'Stable cavitation state, significant noise and vibration',
+    'Flashing': 'Medium vaporizing, severe noise and vibration'
   };
   return descriptions[state];
 }

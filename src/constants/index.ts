@@ -1,115 +1,115 @@
 /**
- * Kv计算系统数值常数
- * 基于 IEC 60534-2-1 标准
+ * Kv Calculation System Numerical Constants
+ * Based on IEC 60534-2-1 Standard
  */
 
 export const CONSTANTS = {
-  // ===== Kv计算常数 =====
-  // 这些值来自Excel文件中的实际使用值
+  // ===== Kv Calculation Constants =====
+  // These values are from actual usage in Excel file
 
   /**
-   * N1: 液体Kv计算常数
-   * 用于: C = Q/N1 * sqrt(ρ/ρ0 / ΔP)
-   * 单位: m³/h, KPa
+   * N1: Liquid Kv calculation constant
+   * Used in: C = Q/N1 * sqrt(ρ/ρ0 / ΔP)
+   * Units: m³/h, KPa
    */
   N1: 0.1,
 
   /**
-   * N2: 管道几何系数计算常数
-   * 用于: FP计算
+   * N2: Piping geometry factor calculation constant
+   * Used in: FP calculation
    */
   N2: 0.0016,
 
   /**
-   * N4: 雷诺数计算常数
-   * 用于: Rev计算
+   * N4: Reynolds number calculation constant
+   * Used in: Rev calculation
    */
   N4: 0.0707,
 
   /**
-   * N5: xTP计算常数
+   * N5: xTP calculation constant
    */
   N5: 0.0018,
 
   /**
-   * N6: 蒸汽Kv计算常数
-   * 用于: C = W/(N6*Y*sqrt(x*P1*ρ1))
+   * N6: Steam Kv calculation constant
+   * Used in: C = W/(N6*Y*sqrt(x*P1*ρ1))
    */
   N6: 3.16,
 
   /**
-   * N9: 气体Kv计算常数
-   * 用于: C = Qn/(N9*P1*Y) * sqrt(22.4*M*Z*T1/x)
+   * N9: Gas Kv calculation constant
+   * Used in: C = Qn/(N9*P1*Y) * sqrt(22.4*M*Z*T1/x)
    */
   N9: 24.6,
 
   /**
-   * N14: 噪音计算常数
+   * N14: Noise calculation constant
    */
   N14: 0.0049,
 
   /**
-   * N16: 噪音计算常数
+   * N16: Noise calculation constant
    */
   N16: 42300,
 
   /**
-   * N18: Fd计算常数
+   * N18: Fd calculation constant
    */
   N18: 17.3,
 
-  // ===== 安托因方程常数 (水) =====
+  // ===== Antoine Equation Constants (Water) =====
   // log10(Pv) = A - B/(C + T)
-  // Pv: 饱和蒸汽压 (KPa)
-  // T: 温度 (℃)
+  // Pv: Saturation vapor pressure (KPa)
+  // T: Temperature (℃)
   ANTOINE: {
     A: 7.07406,
     B: 1657.46,
     C: 227.02
   },
 
-  // ===== 参考值 =====
-  /** 水的标准密度 kg/m³ */
+  // ===== Reference Values =====
+  /** Water standard density kg/m³ */
   WATER_DENSITY: 1000,
 
-  /** 标准大气压 KPa */
+  /** Standard atmospheric pressure KPa */
   STD_PRESSURE: 101.325,
 
-  /** 绝对零度偏移 K */
+  /** Absolute zero offset K */
   STD_TEMP: 273.15,
 
-  /** 水的临界压力 MPa */
+  /** Water critical pressure MPa */
   WATER_CRITICAL_PRESSURE: 22.12,
 
-  /** Kv转Cv系数 */
+  /** Kv to Cv conversion factor */
   KV_TO_CV: 1.156,
 
-  // ===== 默认值 =====
+  // ===== Default Values =====
   DEFAULT: {
-    /** 默认压缩系数 */
+    /** Default compressibility factor */
     Z: 1,
-    /** 默认比热比(空气) */
+    /** Default specific heat ratio (air) */
     GAMMA: 1.4,
-    /** 默认可调比 */
+    /** Default rangeability */
     RANGEABILITY: 50,
-    /** 默认粘度 cP */
+    /** Default viscosity cP */
     VISCOSITY: 1,
-    /** 默认Fd值 */
+    /** Default Fd value */
     FD: 0.42
   },
 
-  // ===== 判定阈值 =====
+  // ===== Threshold Values =====
   THRESHOLD: {
-    /** 紊流判定阈值 */
+    /** Turbulent flow threshold */
     TURBULENT_RE: 10000,
-    /** 误差容限 (0.1%) */
+    /** Error tolerance (0.1%) */
     TOLERANCE: 0.001
   }
 };
 
 /**
- * 管道规格表 - SCH40 标准壁厚
- * 格式: { DN: [外径mm, 壁厚mm] }
+ * Pipe Specification Table - SCH40 Standard Wall Thickness
+ * Format: { DN: [outer diameter mm, wall thickness mm] }
  */
 export const PIPE_SPECS: Record<number, [number, number]> = {
   6: [10.3, 1.73],
@@ -137,7 +137,7 @@ export const PIPE_SPECS: Record<number, [number, number]> = {
 };
 
 /**
- * 根据DN获取管道规格
+ * Get pipe specification by DN
  */
 export function getPipeSpec(dn: number): { outerDiameter: number; wallThickness: number } | null {
   const spec = PIPE_SPECS[dn];

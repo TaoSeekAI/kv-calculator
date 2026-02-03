@@ -1,43 +1,43 @@
 /**
- * 阀门开度计算模块
+ * Valve Opening Calculation Module
  */
 import type { FlowCharacteristic } from '../types/index.js';
 /**
- * 计算等百分比开度
- * 开度% = (1 - LOG10(m) / LOG10(R)) × 100
+ * Calculate equal percentage opening
+ * Opening% = (1 - LOG10(m) / LOG10(R)) × 100
  *
- * @param m 比值 = 额定Kv / 计算Kv
- * @param R 固有可调比
+ * @param m Ratio = Rated Kv / Calculated Kv
+ * @param R Inherent rangeability
  */
 export declare function calcEqualPercentageOpening(m: number, R: number): number;
 /**
- * 计算线性开度
- * 开度% = (R - m) / ((R - 1) × m) × 100
+ * Calculate linear opening
+ * Opening% = (R - m) / ((R - 1) × m) × 100
  *
- * @param m 比值 = 额定Kv / 计算Kv
- * @param R 固有可调比
+ * @param m Ratio = Rated Kv / Calculated Kv
+ * @param R Inherent rangeability
  */
 export declare function calcLinearOpening(m: number, R: number): number;
 /**
- * 计算快开开度
- * 开度% = (1 - √(R×(m-1) / ((R-1)×m))) × 100
+ * Calculate quick opening percentage
+ * Opening% = (1 - √(R×(m-1) / ((R-1)×m))) × 100
  *
- * @param m 比值 = 额定Kv / 计算Kv
- * @param R 固有可调比
+ * @param m Ratio = Rated Kv / Calculated Kv
+ * @param R Inherent rangeability
  */
 export declare function calcQuickOpeningOpening(m: number, R: number): number;
 /**
- * 计算阀门开度
+ * Calculate valve opening
  *
- * @param calculatedKv 计算Kv
- * @param ratedKv 额定Kv
- * @param rangeability 固有可调比 R
- * @param flowChar 流量特性
+ * @param calculatedKv Calculated Kv
+ * @param ratedKv Rated Kv
+ * @param rangeability Inherent rangeability R
+ * @param flowChar Flow characteristic
  */
 export declare function calcValveOpening(calculatedKv: number, ratedKv: number, rangeability: number, flowChar: FlowCharacteristic): number;
 /**
- * 验证开度是否在合理范围
- * 通常开度应在 10% - 90% 之间
+ * Validate if opening is within reasonable range
+ * Typically opening should be between 10% - 90%
  */
 export declare function validateOpening(opening: number): {
     valid: boolean;

@@ -1,6 +1,6 @@
 /**
- * Kv综合计算器
- * 整合液体、气体、蒸汽的Kv计算
+ * Kv Comprehensive Calculator
+ * Integrates Kv calculation for liquids, gases, and steam
  */
 
 import { CONSTANTS, PIPE_SPECS } from './constants/index.js';
@@ -39,67 +39,67 @@ import { calculateLiquidNoise } from './calculators/liquid-noise.js';
 import type { NoiseInput, NoiseResult } from './calculators/noise/types.js';
 
 /**
- * Kv计算器类
+ * Kv Calculator Class
  */
 export class KvCalculator {
   /**
-   * 综合Kv计算
+   * Comprehensive Kv calculation
    */
   calculate(input: KvInput): KvResult {
     const errors: string[] = [];
     const warnings: string[] = [];
 
-    // 1. 单位转换
+    // 1. Unit conversion
     const P1Abs = convertPressureToKPaAbs(input.P1, input.pressureUnit);
     const P2Abs = convertPressureToKPaAbs(input.P2, input.pressureUnit);
     const deltaP = P1Abs - P2Abs;
     const T1 = convertTemperatureToK(input.temperature, input.tempUnit);
     const tempCelsius = convertTemperatureToCelsius(input.temperature, input.tempUnit);
 
-    // 压力校验
-    if (P1Abs <= 0) errors.push('入口压力必须大于0');
-    if (P2Abs < 0) errors.push('出口压力不能为负');
-    if (deltaP <= 0) errors.push('入口压力必须大于出口压力');
+    // Pressure validation
+    if (P1Abs <= 0) errors.push('Inlet pressure must be greater than 0');
+    if (P2Abs < 0) errors.push('Outlet pressure cannot be negative');
+    if (deltaP <= 0) errors.push('Inlet pressure must be greater than outlet pressure');
 
-    // 密度转换
+    // Density conversion
     const densityKgM3 = convertDensityToKgM3(input.density, input.densityUnit);
 
-    // 阀门口径
+    // Valve diameter
     const d = input.seatSize || input.DN;
 
-    // 管道内径
-    // 当seatSize等于DN时，Excel使用DN作为D1/D2（假设无异径管）
+    // Pipe inner diameter
+    // When seatSize equals DN, Excel uses DN as D1/D2 (assuming no reducers)
     const seatEqualsNominal = !input.seatSize || input.seatSize === input.DN;
     const D1 = seatEqualsNominal ? d : getPipeInnerDiameter(input.DN, input.D1w, input.D1T);
     const D2 = seatEqualsNominal ? d : getPipeInnerDiameter(input.DN, input.D2w, input.D2T);
 
-    // 判断是否有管件
+    // Determine if there are fittings
     const hasFittings = d !== D1 || d !== D2;
 
-    // 粘度转换
+    // Viscosity conversion
     const kinematicViscosity = input.viscosity
       ? convertViscosityToM2S(
           input.viscosity,
           input.viscosityUnit || 'cP',
-          input.viscosityType || '粘度',
+          input.viscosityType || 'Viscosity',
           densityKgM3
         )
-      : CONSTANTS.DEFAULT.VISCOSITY / 1000 / densityKgM3; // 默认1cP
+      : CONSTANTS.DEFAULT.VISCOSITY / 1000 / densityKgM3; // Default 1cP
 
-    // 默认值
+    // Default values
     const Fd = input.Fd ?? CONSTANTS.DEFAULT.FD;
     const Z = input.Z ?? CONSTANTS.DEFAULT.Z;
     const gamma = input.gamma ?? CONSTANTS.DEFAULT.GAMMA;
     const Pc = input.Pc ?? CONSTANTS.WATER_CRITICAL_PRESSURE;
 
-    // 2. 根据流体类型进行计算
+    // 2. Calculate based on fluid type
     let calculatedKv: number;
-    let flowState: FlowState = '非阻塞流';
-    let turbulenceState: TurbulenceState = '紊流';
+    let flowState: FlowState = 'Non-choked';
+    let turbulenceState: TurbulenceState = 'Turbulent';
     let fluidState: FluidState | undefined;
     let usedFormula: string = '';
 
-    // 中间值
+    // Intermediate values
     const sumK = calcSumK(d, D1, D2);
     const Ci = input.ratedKv * 1.3;
     let FP = calcFP(sumK, Ci, d);
@@ -120,31 +120,31 @@ export class KvCalculator {
     let normalFlowNm3h: number | undefined;
 
     switch (input.fluidType) {
-      case '液体': {
-        // 液体计算
+      case 'Liquid': {
+        // Liquid calculation
         relativeDensity = calcRelativeDensity(densityKgM3);
         Pv = calcSaturationPressure(tempCelsius);
         FF = calcFF(Pv, Pc);
         saturationTemp = calcSaturationTemperature(P1Abs);
 
-        // 温度校验
+        // Temperature validation
         if (tempCelsius > saturationTemp) {
-          errors.push('介质温度高于饱和温度');
+          errors.push('Medium temperature is above saturation temperature');
         }
 
-        // 压力校验
+        // Pressure validation
         if (P1Abs <= Pv) {
-          errors.push('入口压力小于饱和蒸汽压');
+          errors.push('Inlet pressure is below vapor pressure');
         }
 
-        // 流量转换
+        // Flow conversion
         volumeFlowM3h = convertLiquidFlowToM3h(input.flowRate, input.flowUnit, densityKgM3);
         massFlowKgh = volumeFlowM3h * densityKgM3;
 
-        // 先用简化计算获取初步Kv用于雷诺数计算
+        // Use simplified calculation for initial Kv for Reynolds number calculation
         const C_initial = volumeFlowM3h / CONSTANTS.N1 * Math.sqrt(relativeDensity / deltaP);
 
-        // 计算雷诺数
+        // Calculate Reynolds number
         const reynoldsResult = calculateReynolds({
           Q: volumeFlowM3h,
           nu: kinematicViscosity,
@@ -160,7 +160,7 @@ export class KvCalculator {
         lambda = reynoldsResult.lambda;
         turbulenceState = reynoldsResult.turbulenceState;
 
-        // 液体Kv计算
+        // Liquid Kv calculation
         const liquidResult = calculateLiquidKv({
           Q: volumeFlowM3h,
           P1: P1Abs,
@@ -183,19 +183,19 @@ export class KvCalculator {
         usedFormula = liquidResult.usedFormula;
         xF = liquidResult.intermediate.xF;
 
-        // 更新FP/FLP
+        // Update FP/FLP
         FP = liquidResult.intermediate.FP;
         FLP = liquidResult.intermediate.FLP;
         break;
       }
 
-      case '气体': {
-        // 气体标准密度计算
+      case 'Gas': {
+        // Gas standard density calculation
         const rhoN = input.densityUnit === 'Kg/Nm3'
           ? input.density
           : convertGasDensityToActual(input.density, CONSTANTS.STD_PRESSURE, CONSTANTS.STD_TEMP);
 
-        // 流量转换
+        // Flow conversion
         normalFlowNm3h = convertGasFlowToNm3h(
           input.flowRate,
           input.flowUnit,
@@ -204,10 +204,10 @@ export class KvCalculator {
           T1
         );
 
-        // 分子量
+        // Molecular weight
         const M = input.molecularWeight || (rhoN * 22.4);
 
-        // 气体Kv计算
+        // Gas Kv calculation
         const gasResult = calculateGasKv({
           Qn: normalFlowNm3h,
           P1: P1Abs,
@@ -233,11 +233,11 @@ export class KvCalculator {
         break;
       }
 
-      case '蒸汽': {
-        // 流量转换
+      case 'Steam': {
+        // Flow conversion
         massFlowKgh = convertSteamFlowToKgh(input.flowRate, input.flowUnit, densityKgM3);
 
-        // 蒸汽Kv计算
+        // Steam Kv calculation
         const steamResult = calculateSteamKv({
           W: massFlowKgh,
           P1: P1Abs,
@@ -263,10 +263,10 @@ export class KvCalculator {
       }
 
       default:
-        throw new Error(`不支持的流体类型: ${input.fluidType}`);
+        throw new Error(`Unsupported fluid type: ${input.fluidType}`);
     }
 
-    // 3. 计算阀门开度
+    // 3. Calculate valve opening
     const valveOpening = calcValveOpening(
       calculatedKv,
       input.ratedKv,
@@ -279,20 +279,20 @@ export class KvCalculator {
       warnings.push(openingValidation.warning);
     }
 
-    // 4. 计算出口流速
+    // 4. Calculate outlet velocity
     let outletVelocity = 0;
-    if (input.fluidType === '液体' && volumeFlowM3h) {
+    if (input.fluidType === 'Liquid' && volumeFlowM3h) {
       outletVelocity = calcVelocity(volumeFlowM3h, d);
-    } else if (input.fluidType === '气体' && normalFlowNm3h) {
-      // 气体工况体积流量
+    } else if (input.fluidType === 'Gas' && normalFlowNm3h) {
+      // Gas actual volume flow rate
       const actualFlowM3h = normalFlowNm3h * CONSTANTS.STD_PRESSURE * T1 / (P2Abs * CONSTANTS.STD_TEMP);
       outletVelocity = calcVelocity(actualFlowM3h, d);
-    } else if (input.fluidType === '蒸汽' && massFlowKgh) {
+    } else if (input.fluidType === 'Steam' && massFlowKgh) {
       const volumeFlow = massFlowKgh / densityKgM3;
       outletVelocity = calcVelocity(volumeFlow, d);
     }
 
-    // 5. 组装结果
+    // 5. Assemble result
     const intermediate: IntermediateValues = {
       P1Abs,
       P2Abs,
@@ -338,44 +338,44 @@ export class KvCalculator {
   }
 
   /**
-   * 计算噪音
-   * @param input 原始输入参数
-   * @param result 已计算的Kv结果
-   * @returns 噪音级 dBA
+   * Calculate noise
+   * @param input Original input parameters
+   * @param result Calculated Kv result
+   * @returns Noise level dBA
    */
   calculateNoise(input: KvInput, result: KvResult): NoiseResult | null {
     try {
-      // 获取管道规格
+      // Get pipe specification
       const pipeSpec = PIPE_SPECS[input.DN];
       if (!pipeSpec) {
         return null;
       }
 
       const [outerDiameter, wallThickness] = pipeSpec;
-      const Di = outerDiameter - 2 * wallThickness;  // 管道内径 mm
-      const tp = wallThickness;  // 壁厚 mm
-      const d = input.seatSize || input.DN;  // 阀座直径 mm
+      const Di = outerDiameter - 2 * wallThickness;  // Pipe inner diameter mm
+      const tp = wallThickness;  // Wall thickness mm
+      const d = input.seatSize || input.DN;  // Seat diameter mm
 
-      // 计算质量流量
+      // Calculate mass flow
       let massFlow = result.intermediate.massFlowKgh || 0;
 
-      // 对于气体，从标准体积流量计算质量流量
-      if (input.fluidType === '气体' && result.intermediate.normalFlowNm3h) {
-        // 标准密度下: massFlow = Qn * rhoN
+      // For gas, calculate mass flow from standard volume flow
+      if (input.fluidType === 'Gas' && result.intermediate.normalFlowNm3h) {
+        // At standard density: massFlow = Qn * rhoN
         const rhoN = input.densityUnit === 'Kg/Nm3'
           ? input.density
           : input.density * CONSTANTS.STD_TEMP / result.intermediate.T1 * result.intermediate.P1Abs / CONSTANTS.STD_PRESSURE;
         massFlow = result.intermediate.normalFlowNm3h * rhoN;
       }
 
-      // 对于液体，从体积流量计算
-      if (input.fluidType === '液体' && result.intermediate.volumeFlowM3h && massFlow === 0) {
+      // For liquid, calculate from volume flow
+      if (input.fluidType === 'Liquid' && result.intermediate.volumeFlowM3h && massFlow === 0) {
         massFlow = result.intermediate.volumeFlowM3h * result.intermediate.densityKgM3;
       }
 
-      // 构建噪音计算输入
+      // Build noise calculation input
       const noiseInput: NoiseInput = {
-        fluidType: input.fluidType === '蒸汽' ? '蒸汽' : (input.fluidType === '气体' ? '气体' : '液体'),
+        fluidType: input.fluidType === 'Steam' ? 'Steam' : (input.fluidType === 'Gas' ? 'Gas' : 'Liquid'),
         P1: result.intermediate.P1Abs,
         P2: result.intermediate.P2Abs,
         deltaP: result.intermediate.deltaP,
@@ -383,7 +383,7 @@ export class KvCalculator {
         massFlow,
         volumeFlow: result.intermediate.volumeFlowM3h,
         density: result.intermediate.densityKgM3,
-        density2: input.fluidType === '气体'
+        density2: input.fluidType === 'Gas'
           ? result.intermediate.densityKgM3 * Math.pow(result.intermediate.P2Abs / result.intermediate.P1Abs, 1 / (input.gamma || 1.4))
           : undefined,
         gamma: input.gamma || CONSTANTS.DEFAULT.GAMMA,
@@ -394,7 +394,7 @@ export class KvCalculator {
         FL: input.FL,
         xT: input.XT,
         Fd: input.Fd || CONSTANTS.DEFAULT.FD,
-        xFz: undefined,  // 将自动计算
+        xFz: undefined,  // Will be calculated automatically
         xF: result.intermediate.xF,
         Di,
         tp,
@@ -402,25 +402,25 @@ export class KvCalculator {
         pipeMaterial: 'steel'
       };
 
-      // 根据流体类型选择噪音计算方法
-      if (input.fluidType === '液体') {
+      // Select noise calculation method based on fluid type
+      if (input.fluidType === 'Liquid') {
         return calculateLiquidNoise(noiseInput);
-      } else if (input.fluidType === '气体' || input.fluidType === '蒸汽') {
+      } else if (input.fluidType === 'Gas' || input.fluidType === 'Steam') {
         return calculateGasNoise(noiseInput);
       }
 
       return null;
     } catch (error) {
-      // 噪音计算失败不影响主计算结果
-      console.error('噪音计算失败:', error);
+      // Noise calculation failure should not affect main calculation result
+      console.error('Noise calculation failed:', error);
       return null;
     }
   }
 
   /**
-   * 综合计算 (包含噪音)
-   * @param input 输入参数
-   * @param includeNoise 是否计算噪音 (默认true)
+   * Comprehensive calculation (including noise)
+   * @param input Input parameters
+   * @param includeNoise Whether to calculate noise (default true)
    */
   calculateWithNoise(input: KvInput, includeNoise: boolean = true): KvResult & { noiseResult?: NoiseResult } {
     const result = this.calculate(input);
@@ -437,5 +437,5 @@ export class KvCalculator {
   }
 }
 
-// 导出默认计算器实例
+// Export default calculator instance
 export const kvCalculator = new KvCalculator();

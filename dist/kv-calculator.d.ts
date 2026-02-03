@@ -1,28 +1,28 @@
 /**
- * Kv综合计算器
- * 整合液体、气体、蒸汽的Kv计算
+ * Kv Comprehensive Calculator
+ * Integrates Kv calculation for liquids, gases, and steam
  */
 import type { KvInput, KvResult } from './types/index.js';
 import type { NoiseResult } from './calculators/noise/types.js';
 /**
- * Kv计算器类
+ * Kv Calculator Class
  */
 export declare class KvCalculator {
     /**
-     * 综合Kv计算
+     * Comprehensive Kv calculation
      */
     calculate(input: KvInput): KvResult;
     /**
-     * 计算噪音
-     * @param input 原始输入参数
-     * @param result 已计算的Kv结果
-     * @returns 噪音级 dBA
+     * Calculate noise
+     * @param input Original input parameters
+     * @param result Calculated Kv result
+     * @returns Noise level dBA
      */
     calculateNoise(input: KvInput, result: KvResult): NoiseResult | null;
     /**
-     * 综合计算 (包含噪音)
-     * @param input 输入参数
-     * @param includeNoise 是否计算噪音 (默认true)
+     * Comprehensive calculation (including noise)
+     * @param input Input parameters
+     * @param includeNoise Whether to calculate noise (default true)
      */
     calculateWithNoise(input: KvInput, includeNoise?: boolean): KvResult & {
         noiseResult?: NoiseResult;

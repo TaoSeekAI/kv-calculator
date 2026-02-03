@@ -1,14 +1,14 @@
 /**
- * 单位转换工具
+ * Unit Conversion Utilities
  */
 import { CONSTANTS, getPipeSpec } from '../constants/index.js';
 /**
- * 压力转换 - 转为绝对压力 KPa
+ * Pressure conversion - Convert to absolute pressure KPa
  */
 export function convertPressureToKPaAbs(value, unit) {
     switch (unit) {
         case 'MPa(G)':
-            return value * 1000 + 100; // 表压转绝对压力
+            return value * 1000 + 100; // Gauge to absolute pressure
         case 'MPa(A)':
             return value * 1000;
         case 'KPa(G)':
@@ -20,11 +20,11 @@ export function convertPressureToKPaAbs(value, unit) {
         case 'bar(A)':
             return value * 100;
         default:
-            throw new Error(`不支持的压力单位: ${unit}`);
+            throw new Error(`Unsupported pressure unit: ${unit}`);
     }
 }
 /**
- * 温度转换 - 转为开尔文 K
+ * Temperature conversion - Convert to Kelvin K
  */
 export function convertTemperatureToK(value, unit) {
     switch (unit) {
@@ -35,11 +35,11 @@ export function convertTemperatureToK(value, unit) {
         case 'F':
             return (value - 32) / 1.8 + CONSTANTS.STD_TEMP;
         default:
-            throw new Error(`不支持的温度单位: ${unit}`);
+            throw new Error(`Unsupported temperature unit: ${unit}`);
     }
 }
 /**
- * 温度转换 - 转为摄氏度 ℃
+ * Temperature conversion - Convert to Celsius ℃
  */
 export function convertTemperatureToCelsius(value, unit) {
     switch (unit) {
@@ -50,11 +50,11 @@ export function convertTemperatureToCelsius(value, unit) {
         case 'F':
             return (value - 32) / 1.8;
         default:
-            throw new Error(`不支持的温度单位: ${unit}`);
+            throw new Error(`Unsupported temperature unit: ${unit}`);
     }
 }
 /**
- * 密度转换 - 转为 Kg/m³
+ * Density conversion - Convert to Kg/m³
  */
 export function convertDensityToKgM3(value, unit) {
     switch (unit) {
@@ -63,31 +63,31 @@ export function convertDensityToKgM3(value, unit) {
         case 'g/cm3':
             return value * 1000;
         case 'Kg/Nm3':
-            return value; // 标准状态密度，需要进一步处理
+            return value; // Standard state density, requires further processing
         default:
-            throw new Error(`不支持的密度单位: ${unit}`);
+            throw new Error(`Unsupported density unit: ${unit}`);
     }
 }
 /**
- * 气体密度转换 - 标准状态到实际状态
- * @param rhoN 标准状态密度 Kg/Nm³
- * @param P1 绝对压力 KPa
- * @param T1 绝对温度 K
- * @returns 实际密度 Kg/m³
+ * Gas density conversion - Standard state to actual state
+ * @param rhoN Standard state density Kg/Nm³
+ * @param P1 Absolute pressure KPa
+ * @param T1 Absolute temperature K
+ * @returns Actual density Kg/m³
  */
 export function convertGasDensityToActual(rhoN, P1, T1) {
     return rhoN * P1 * CONSTANTS.STD_TEMP / (CONSTANTS.STD_PRESSURE * T1);
 }
 /**
- * 粘度转换 - 转为运动粘度 m²/s
- * @param value 粘度值
- * @param unit 粘度单位
- * @param type 粘度类型
- * @param density 密度 kg/m³ (动力粘度转换需要)
+ * Viscosity conversion - Convert to kinematic viscosity m²/s
+ * @param value Viscosity value
+ * @param unit Viscosity unit
+ * @param type Viscosity type
+ * @param density Density kg/m³ (required for dynamic viscosity conversion)
  */
 export function convertViscosityToM2S(value, unit, type, density) {
-    // 运动粘度
-    if (type === '运动粘度 v') {
+    // Kinematic viscosity
+    if (type === 'Kinematic Viscosity') {
         switch (unit) {
             case 'm2/s':
                 return value;
@@ -97,11 +97,11 @@ export function convertViscosityToM2S(value, unit, type, density) {
             case 'St':
                 return value * 1e-4;
             default:
-                throw new Error(`运动粘度不支持单位: ${unit}`);
+                throw new Error(`Kinematic viscosity does not support unit: ${unit}`);
         }
     }
-    // 动力粘度 -> 运动粘度
-    if (type === '动力粘度 u' || type === '粘度') {
+    // Dynamic viscosity -> Kinematic viscosity
+    if (type === 'Dynamic Viscosity' || type === 'Viscosity') {
         let dynamicViscosityPaS;
         switch (unit) {
             case 'Pa.S':
@@ -112,15 +112,15 @@ export function convertViscosityToM2S(value, unit, type, density) {
                 dynamicViscosityPaS = value / 1000;
                 break;
             default:
-                throw new Error(`动力粘度不支持单位: ${unit}`);
+                throw new Error(`Dynamic viscosity does not support unit: ${unit}`);
         }
         // ν = μ / ρ
         return dynamicViscosityPaS / density;
     }
-    throw new Error(`不支持的粘度类型: ${type}`);
+    throw new Error(`Unsupported viscosity type: ${type}`);
 }
 /**
- * 液体体积流量转换 - 转为 m³/h
+ * Liquid volume flow rate conversion - Convert to m³/h
  */
 export function convertLiquidFlowToM3h(value, unit, density) {
     switch (unit) {
@@ -135,15 +135,15 @@ export function convertLiquidFlowToM3h(value, unit, density) {
         case 't/s':
             return value * 1000 / density * 3600;
         default:
-            throw new Error(`液体流量不支持单位: ${unit}`);
+            throw new Error(`Liquid flow does not support unit: ${unit}`);
     }
 }
 /**
- * 气体标准体积流量转换 - 转为 Nm³/h
+ * Gas standard volume flow rate conversion - Convert to Nm³/h
  */
-export function convertGasFlowToNm3h(value, unit, rhoN, // 标准状态密度 Kg/Nm³
-P1, // 绝对压力 KPa
-T1 // 绝对温度 K
+export function convertGasFlowToNm3h(value, unit, rhoN, // Standard state density Kg/Nm³
+P1, // Absolute pressure KPa
+T1 // Absolute temperature K
 ) {
     switch (unit) {
         case 'Nm3/h':
@@ -157,16 +157,16 @@ T1 // 绝对温度 K
         case 't/s':
             return value * 1000 / rhoN * 3600;
         case 'm3/h':
-            // 工况体积 -> 标准体积
+            // Actual volume -> Standard volume
             return value * P1 * CONSTANTS.STD_TEMP / (CONSTANTS.STD_PRESSURE * T1);
         default:
-            throw new Error(`气体流量不支持单位: ${unit}`);
+            throw new Error(`Gas flow does not support unit: ${unit}`);
     }
 }
 /**
- * 蒸汽质量流量转换 - 转为 Kg/h
+ * Steam mass flow rate conversion - Convert to Kg/h
  */
-export function convertSteamFlowToKgh(value, unit, density // 蒸汽密度 Kg/m³
+export function convertSteamFlowToKgh(value, unit, density // Steam density Kg/m³
 ) {
     switch (unit) {
         case 'Kg/h':
@@ -180,19 +180,19 @@ export function convertSteamFlowToKgh(value, unit, density // 蒸汽密度 Kg/m�
         case 'm3/h':
             return value * density;
         default:
-            throw new Error(`蒸汽流量不支持单位: ${unit}`);
+            throw new Error(`Steam flow does not support unit: ${unit}`);
     }
 }
 /**
- * 计算管道内径
- * @param outerDiameter 外径 mm
- * @param wallThickness 壁厚 mm
+ * Calculate pipe inner diameter
+ * @param outerDiameter Outer diameter mm
+ * @param wallThickness Wall thickness mm
  */
 export function calcInnerDiameter(outerDiameter, wallThickness) {
     return outerDiameter - wallThickness * 2;
 }
 /**
- * 获取管道内径（自动查表或计算）
+ * Get pipe inner diameter (auto lookup or calculate)
  */
 export function getPipeInnerDiameter(dn, outerDiameter, wallThickness) {
     if (outerDiameter && wallThickness) {
@@ -202,31 +202,31 @@ export function getPipeInnerDiameter(dn, outerDiameter, wallThickness) {
     if (spec) {
         return calcInnerDiameter(spec.outerDiameter, spec.wallThickness);
     }
-    // 如果没有规格数据，假设内径等于DN
+    // If no specification data, assume inner diameter equals DN
     return dn;
 }
 /**
- * Kv 转 Cv
+ * Kv to Cv conversion
  */
 export function kvToCv(kv) {
     return kv * CONSTANTS.KV_TO_CV;
 }
 /**
- * Cv 转 Kv
+ * Cv to Kv conversion
  */
 export function cvToKv(cv) {
     return cv / CONSTANTS.KV_TO_CV;
 }
 /**
- * 计算相对密度（比重）
+ * Calculate relative density (specific gravity)
  */
 export function calcRelativeDensity(density) {
     return density / CONSTANTS.WATER_DENSITY;
 }
 /**
- * 计算饱和蒸汽压（安托因方程，水）
- * @param tempCelsius 温度 ℃
- * @returns 饱和蒸汽压 KPa
+ * Calculate saturation vapor pressure (Antoine equation, water)
+ * @param tempCelsius Temperature ℃
+ * @returns Saturation vapor pressure KPa
  */
 export function calcSaturationPressure(tempCelsius) {
     const { A, B, C } = CONSTANTS.ANTOINE;
@@ -235,9 +235,9 @@ export function calcSaturationPressure(tempCelsius) {
     return Math.pow(10, logPv);
 }
 /**
- * 计算饱和温度（安托因方程反算，水）
- * @param pressureKPa 绝对压力 KPa
- * @returns 饱和温度 ℃
+ * Calculate saturation temperature (inverse Antoine equation, water)
+ * @param pressureKPa Absolute pressure KPa
+ * @returns Saturation temperature ℃
  */
 export function calcSaturationTemperature(pressureKPa) {
     if (pressureKPa <= 0)
@@ -247,10 +247,10 @@ export function calcSaturationTemperature(pressureKPa) {
     return B / (A - Math.log10(pressureKPa)) - C;
 }
 /**
- * 出口流速计算
- * @param flowM3h 体积流量 m³/h
- * @param diameterMm 管道内径 mm
- * @returns 流速 m/s
+ * Outlet velocity calculation
+ * @param flowM3h Volume flow rate m³/h
+ * @param diameterMm Pipe inner diameter mm
+ * @returns Velocity m/s
  */
 export function calcVelocity(flowM3h, diameterMm) {
     const areaM2 = Math.PI * Math.pow(diameterMm / 1000, 2) / 4;

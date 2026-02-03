@@ -1,4 +1,4 @@
 /**
- * Kv计算系统类型定义
+ * Kv Calculation System Type Definitions
  */
 export {};

@@ -19,6 +19,6 @@ export declare function determineCavitationState(xF: number, xFz: number, FL: nu
  */
 export declare function calculateLiquidNoise(input: NoiseInput): NoiseResult;
 /**
- * 获取空化状态描述
+ * Get cavitation state description
  */
 export declare function getCavitationStateDescription(state: CavitationState): string;

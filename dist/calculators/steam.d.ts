@@ -1,42 +1,42 @@
 /**
- * 蒸汽Kv计算模块
- * 基于 IEC 60534-2-1 标准
+ * Steam Kv Calculation Module
+ * Based on IEC 60534-2-1 Standard
  */
 import type { FlowState } from '../types/index.js';
 /**
- * 蒸汽Kv计算 - 非阻塞流，无接管
+ * Steam Kv calculation - Non-choked flow, without fittings
  * C = W / (N6×Y×√(x×P1×ρ1))
  *
- * @param W 质量流量 Kg/h
- * @param Y 膨胀系数
- * @param x 压差比
- * @param P1 入口绝对压力 KPa
- * @param rho1 入口密度 Kg/m³
+ * @param W Mass flow rate Kg/h
+ * @param Y Expansion factor
+ * @param x Pressure differential ratio
+ * @param P1 Inlet absolute pressure KPa
+ * @param rho1 Inlet density Kg/m³
  */
 export declare function calcSteamKv(W: number, Y: number, x: number, P1: number, rho1: number): number;
 /**
- * 蒸汽Kv计算 - 非阻塞流，带接管
+ * Steam Kv calculation - Non-choked flow, with fittings
  * C = W / (N6×FP×Y×√(x×P1×ρ1))
  */
 export declare function calcSteamKvWithFitting(W: number, FP: number, Y: number, x: number, P1: number, rho1: number): number;
 /**
- * 蒸汽Kv计算 - 阻塞流，无接管
+ * Steam Kv calculation - Choked flow, without fittings
  * C = W / (0.667×N6×√(Fγ×xT×P1×ρ1))
  */
 export declare function calcSteamKvChoked(W: number, Fgamma: number, xT: number, P1: number, rho1: number): number;
 /**
- * 蒸汽Kv计算 - 阻塞流，带接管
+ * Steam Kv calculation - Choked flow, with fittings
  * C = W / (0.667×FP×N6×√(Fγ×xTP×P1×ρ1))
  */
 export declare function calcSteamKvChokedWithFitting(W: number, FP: number, Fgamma: number, xTP: number, P1: number, rho1: number): number;
 /**
- * 蒸汽Kv计算 - 非紊流
+ * Steam Kv calculation - Laminar flow
  * C = W / (N18×FR) × √(T1/(ΔP×(P1+P2)×M))
- * 蒸汽分子量 M = 18.0152
+ * Steam molecular weight M = 18.0152
  */
 export declare function calcSteamKvLaminar(W: number, FR: number, T1: number, deltaP: number, P1: number, P2: number): number;
 /**
- * 蒸汽Kv综合计算参数
+ * Steam Kv comprehensive calculation parameters
  */
 export interface SteamKvParams {
     W: number;
@@ -53,7 +53,7 @@ export interface SteamKvParams {
     FR?: number;
 }
 /**
- * 蒸汽Kv计算结果
+ * Steam Kv calculation result
  */
 export interface SteamKvResult {
     kv: number;
@@ -76,6 +76,6 @@ export interface SteamKvResult {
     };
 }
 /**
- * 蒸汽Kv综合计算
+ * Steam Kv comprehensive calculation
  */
 export declare function calculateSteamKv(params: SteamKvParams): SteamKvResult;

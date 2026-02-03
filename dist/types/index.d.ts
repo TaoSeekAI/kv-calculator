@@ -1,20 +1,20 @@
 /**
- * Kv计算系统类型定义
+ * Kv Calculation System Type Definitions
  */
-export type FluidType = '液体' | '气体' | '蒸汽' | '两相流(液体+气体)' | '两相流(液体+蒸汽)';
-export type FlowCharacteristic = '等百分比' | '线性' | '快开';
+export type FluidType = 'Liquid' | 'Gas' | 'Steam' | 'Two-phase (Liquid+Gas)' | 'Two-phase (Liquid+Steam)';
+export type FlowCharacteristic = 'Equal Percentage' | 'Linear' | 'Quick Opening';
 export type PressureUnit = 'MPa(G)' | 'MPa(A)' | 'KPa(G)' | 'KPa(A)' | 'bar(G)' | 'bar(A)';
 export type TemperatureUnit = '℃' | 'K' | 'F';
 export type FlowUnit = 'm3/h' | 'Kg/h' | 'Kg/s' | 't/h' | 't/s' | 'Nm3/h';
 export type DensityUnit = 'Kg/m3' | 'g/cm3' | 'Kg/Nm3';
 export type ViscosityUnit = 'm2/s' | 'mm2/s' | 'St' | 'cSt' | 'cP' | 'Pa.S' | 'mPa.S';
-export type ViscosityType = '运动粘度 v' | '动力粘度 u' | '粘度';
-export type FlowState = '阻塞流' | '非阻塞流';
-export type TurbulenceState = '紊流' | '非紊流';
-export type FluidState = '无气蚀' | '初始气蚀' | '空化' | '闪蒸';
-export type ValveInternalsType = '标准型' | '多级降压';
+export type ViscosityType = 'Kinematic Viscosity' | 'Dynamic Viscosity' | 'Viscosity';
+export type FlowState = 'Choked' | 'Non-choked';
+export type TurbulenceState = 'Turbulent' | 'Laminar';
+export type FluidState = 'No Cavitation' | 'Incipient Cavitation' | 'Cavitation' | 'Flashing';
+export type ValveInternalsType = 'Standard' | 'Multi-stage Pressure Reduction';
 /**
- * Kv计算输入参数
+ * Kv Calculation Input Parameters
  */
 export interface KvInput {
     fluidType: FluidType;
@@ -53,7 +53,7 @@ export interface KvInput {
     valveInternalsType?: ValveInternalsType;
 }
 /**
- * 中间计算值
+ * Intermediate Calculation Values
  */
 export interface IntermediateValues {
     P1Abs: number;
@@ -90,7 +90,7 @@ export interface IntermediateValues {
     flowStateWithFitting?: FlowState;
 }
 /**
- * Kv计算结果
+ * Kv Calculation Result
  */
 export interface KvResult {
     calculatedKv: number;
@@ -109,7 +109,7 @@ export interface KvResult {
     warnings?: string[];
 }
 /**
- * Excel比对结果
+ * Excel Comparison Result
  */
 export interface ComparisonResult {
     field: string;
@@ -121,7 +121,7 @@ export interface ComparisonResult {
     passed: boolean;
 }
 /**
- * 比对报告
+ * Comparison Report
  */
 export interface ComparisonReport {
     timestamp: string;

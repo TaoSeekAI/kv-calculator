@@ -1,5 +1,5 @@
 /**
- * 噪音计算类型定义
- * 基于 IEC 60534-8-3 (气体) 和 IEC 60534-8-4 (液体)
+ * Noise Calculation Type Definitions
+ * Based on IEC 60534-8-3 (Gas) and IEC 60534-8-4 (Liquid)
  */
 export {};

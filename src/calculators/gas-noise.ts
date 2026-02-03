@@ -569,18 +569,18 @@ export function calculateGasNoise(input: NoiseInput): NoiseResult {
   // 限制范围
   noiseLevel = Math.max(NOISE_CONSTANTS.MIN_NOISE, Math.min(NOISE_CONSTANTS.MAX_NOISE, noiseLevel));
 
-  // 添加警告
+  // Add warnings
   if (Mvc >= 1) {
-    warnings.push('缩流断面达到声速，噪音较大');
+    warnings.push('Vena contracta reaches sonic velocity, high noise level');
   }
   if (noiseLevel > 85) {
-    warnings.push(`噪音级 ${noiseLevel.toFixed(1)} dBA 超过85dBA，需要采取降噪措施`);
+    warnings.push(`Noise level ${noiseLevel.toFixed(1)} dBA exceeds 85dBA, noise reduction measures needed`);
   }
   if (noiseLevel > 100) {
-    warnings.push('噪音级超过100dBA，建议选用低噪音阀或加装消音器');
+    warnings.push('Noise level exceeds 100dBA, recommend low-noise valve or silencer');
   }
   if (M0 > 0.3) {
-    warnings.push(`出口马赫数 ${M0.toFixed(2)} 较高，可能需要考虑高马赫数修正`);
+    warnings.push(`Outlet Mach number ${M0.toFixed(2)} is high, may need high Mach number correction`);
   }
 
   // 构建中间计算值
@@ -609,13 +609,13 @@ export function calculateGasNoise(input: NoiseInput): NoiseResult {
     Lg
   };
 
-  // 流动状态描述
+  // Flow state description
   const stateDescription: Record<GasFlowState, string> = {
-    'State I': '亚音速流',
-    'State II': '过渡流',
-    'State III': '临界流',
-    'State IV': '常数声效',
-    'State V': '完全阻塞'
+    'State I': 'Subsonic flow',
+    'State II': 'Transitional flow',
+    'State III': 'Critical flow',
+    'State IV': 'Constant acoustic efficiency',
+    'State V': 'Fully choked'
   };
 
   return {
@@ -628,15 +628,15 @@ export function calculateGasNoise(input: NoiseInput): NoiseResult {
 }
 
 /**
- * 气体噪音流动状态描述
+ * Gas noise flow state description
  */
 export function getGasFlowStateDescription(state: GasFlowState): string {
   const descriptions: Record<GasFlowState, string> = {
-    'State I': '亚音速流 - 缩流断面流速低于声速',
-    'State II': '过渡流 - 接近临界流状态',
-    'State III': '临界流 - 缩流断面达到声速',
-    'State IV': '常数声效系数 - 高压差比',
-    'State V': '完全阻塞流 - 最大噪音状态'
+    'State I': 'Subsonic flow - Vena contracta velocity below sonic',
+    'State II': 'Transitional flow - Approaching critical flow state',
+    'State III': 'Critical flow - Vena contracta reaches sonic velocity',
+    'State IV': 'Constant acoustic efficiency - High pressure ratio',
+    'State V': 'Fully choked flow - Maximum noise state'
   };
   return descriptions[state];
 }

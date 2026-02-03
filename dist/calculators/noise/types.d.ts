@@ -1,15 +1,15 @@
 /**
- * 噪音计算类型定义
- * 基于 IEC 60534-8-3 (气体) 和 IEC 60534-8-4 (液体)
+ * Noise Calculation Type Definitions
+ * Based on IEC 60534-8-3 (Gas) and IEC 60534-8-4 (Liquid)
  */
 export type GasFlowState = 'State I' | 'State II' | 'State III' | 'State IV' | 'State V';
-export type CavitationState = '无空化' | '初生空化' | '恒定空化' | '闪蒸';
+export type CavitationState = 'No Cavitation' | 'Incipient Cavitation' | 'Constant Cavitation' | 'Flashing';
 export type PipeMaterial = 'steel' | 'stainless';
 /**
- * 噪音计算输入参数
+ * Noise Calculation Input Parameters
  */
 export interface NoiseInput {
-    fluidType: '液体' | '气体' | '蒸汽';
+    fluidType: 'Liquid' | 'Gas' | 'Steam';
     P1: number;
     P2: number;
     deltaP: number;
@@ -35,7 +35,7 @@ export interface NoiseInput {
     d: number;
 }
 /**
- * 气体噪音中间计算值
+ * Gas Noise Intermediate Calculation Values
  */
 export interface GasNoiseIntermediate {
     P2C: number;
@@ -62,7 +62,7 @@ export interface GasNoiseIntermediate {
     Lg?: number;
 }
 /**
- * 液体噪音中间计算值
+ * Liquid Noise Intermediate Calculation Values
  */
 export interface LiquidNoiseIntermediate {
     deltaPc: number;
@@ -82,7 +82,7 @@ export interface LiquidNoiseIntermediate {
     xFz: number;
 }
 /**
- * 噪音计算结果
+ * Noise Calculation Result
  */
 export interface NoiseResult {
     noiseLevel: number;

@@ -29,6 +29,6 @@ export declare function determineGasFlowState(P1: number, P2: number, xT: number
  */
 export declare function calculateGasNoise(input: NoiseInput): NoiseResult;
 /**
- * 气体噪音流动状态描述
+ * Gas noise flow state description
  */
 export declare function getGasFlowStateDescription(state: GasFlowState): string;

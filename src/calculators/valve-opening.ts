@@ -1,15 +1,15 @@
 /**
- * 阀门开度计算模块
+ * Valve Opening Calculation Module
  */
 
 import type { FlowCharacteristic } from '../types/index.js';
 
 /**
- * 计算等百分比开度
- * 开度% = (1 - LOG10(m) / LOG10(R)) × 100
+ * Calculate equal percentage opening
+ * Opening% = (1 - LOG10(m) / LOG10(R)) × 100
  *
- * @param m 比值 = 额定Kv / 计算Kv
- * @param R 固有可调比
+ * @param m Ratio = Rated Kv / Calculated Kv
+ * @param R Inherent rangeability
  */
 export function calcEqualPercentageOpening(m: number, R: number): number {
   if (m <= 0 || R <= 1) return NaN;
@@ -17,11 +17,11 @@ export function calcEqualPercentageOpening(m: number, R: number): number {
 }
 
 /**
- * 计算线性开度
- * 开度% = (R - m) / ((R - 1) × m) × 100
+ * Calculate linear opening
+ * Opening% = (R - m) / ((R - 1) × m) × 100
  *
- * @param m 比值 = 额定Kv / 计算Kv
- * @param R 固有可调比
+ * @param m Ratio = Rated Kv / Calculated Kv
+ * @param R Inherent rangeability
  */
 export function calcLinearOpening(m: number, R: number): number {
   if (m <= 0 || R <= 1) return NaN;
@@ -29,11 +29,11 @@ export function calcLinearOpening(m: number, R: number): number {
 }
 
 /**
- * 计算快开开度
- * 开度% = (1 - √(R×(m-1) / ((R-1)×m))) × 100
+ * Calculate quick opening percentage
+ * Opening% = (1 - √(R×(m-1) / ((R-1)×m))) × 100
  *
- * @param m 比值 = 额定Kv / 计算Kv
- * @param R 固有可调比
+ * @param m Ratio = Rated Kv / Calculated Kv
+ * @param R Inherent rangeability
  */
 export function calcQuickOpeningOpening(m: number, R: number): number {
   if (m <= 1 || R <= 1) return NaN;
@@ -43,12 +43,12 @@ export function calcQuickOpeningOpening(m: number, R: number): number {
 }
 
 /**
- * 计算阀门开度
+ * Calculate valve opening
  *
- * @param calculatedKv 计算Kv
- * @param ratedKv 额定Kv
- * @param rangeability 固有可调比 R
- * @param flowChar 流量特性
+ * @param calculatedKv Calculated Kv
+ * @param ratedKv Rated Kv
+ * @param rangeability Inherent rangeability R
+ * @param flowChar Flow characteristic
  */
 export function calcValveOpening(
   calculatedKv: number,
@@ -59,43 +59,43 @@ export function calcValveOpening(
   const m = ratedKv / calculatedKv;
 
   switch (flowChar) {
-    case '等百分比':
+    case 'Equal Percentage':
       return calcEqualPercentageOpening(m, rangeability);
-    case '线性':
+    case 'Linear':
       return calcLinearOpening(m, rangeability);
-    case '快开':
+    case 'Quick Opening':
       return calcQuickOpeningOpening(m, rangeability);
     default:
-      throw new Error(`不支持的流量特性: ${flowChar}`);
+      throw new Error(`Unsupported flow characteristic: ${flowChar}`);
   }
 }
 
 /**
- * 验证开度是否在合理范围
- * 通常开度应在 10% - 90% 之间
+ * Validate if opening is within reasonable range
+ * Typically opening should be between 10% - 90%
  */
 export function validateOpening(opening: number): {
   valid: boolean;
   warning?: string;
 } {
   if (isNaN(opening)) {
-    return { valid: false, warning: '开度计算结果无效' };
+    return { valid: false, warning: 'Invalid opening calculation result' };
   }
 
   if (opening < 0) {
-    return { valid: false, warning: '开度小于0%，阀门选型过大' };
+    return { valid: false, warning: 'Opening less than 0%, valve oversized' };
   }
 
   if (opening > 100) {
-    return { valid: false, warning: '开度超过100%，阀门选型过小' };
+    return { valid: false, warning: 'Opening exceeds 100%, valve undersized' };
   }
 
   if (opening < 10) {
-    return { valid: true, warning: '开度小于10%，建议选择更小口径阀门' };
+    return { valid: true, warning: 'Opening less than 10%, consider selecting a smaller valve' };
   }
 
   if (opening > 90) {
-    return { valid: true, warning: '开度大于90%，建议选择更大口径阀门' };
+    return { valid: true, warning: 'Opening greater than 90%, consider selecting a larger valve' };
   }
 
   return { valid: true };
