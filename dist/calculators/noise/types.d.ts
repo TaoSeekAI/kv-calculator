@@ -52,6 +52,7 @@ export interface GasNoiseIntermediate {
     Wa: number;
     Lpi: number;
     TL: number;
+    Lpae: number;
     Lpe: number;
     fp: number;
     deltaLA: number;
@@ -76,6 +77,7 @@ export interface LiquidNoiseIntermediate {
     rw: number;
     Lpi: number;
     TL: number;
+    Lpae: number;
     Lpe: number;
     fp: number;
     xF: number;

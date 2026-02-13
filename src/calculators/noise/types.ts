@@ -93,7 +93,8 @@ export interface GasNoiseIntermediate {
   // Noise levels
   Lpi: number;             // Internal sound power level dB
   TL: number;              // Transmission loss dB
-  Lpe: number;             // External noise level dB
+  Lpae: number;            // Pipe exterior A-weighted sound pressure level dB
+  Lpe: number;             // External noise level at 1m dB (LpAe,1m)
 
   // Frequency
   fp: number;              // Peak frequency Hz
@@ -131,7 +132,8 @@ export interface LiquidNoiseIntermediate {
   // Noise levels
   Lpi: number;             // Internal sound power level dB
   TL: number;              // Transmission loss dB
-  Lpe: number;             // External noise level dB
+  Lpae: number;            // Pipe exterior A-weighted sound pressure level dB
+  Lpe: number;             // External noise level at 1m dB (LpAe,1m)
 
   // Frequency
   fp: number;              // Peak frequency Hz

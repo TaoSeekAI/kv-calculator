@@ -19,7 +19,7 @@ export declare const NOISE_CONSTANTS: {
     WATER_SOUND_SPEED: number;
     /** 空气声速基准 m/s */
     AIR_SOUND_SPEED: number;
-    /** 通用气体常数 J/(mol·K) */
+    /** 通用气体常数 J/(kmol·K) — 匹配Excel E28 */
     R: number;
     /** 参考声效系数 (气体) */
     ETA_REF_GAS: number;

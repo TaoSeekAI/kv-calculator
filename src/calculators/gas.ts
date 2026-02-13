@@ -231,32 +231,43 @@ export function calculateGasKv(params: GasKvParams): GasKvResult {
   const deltaP = P1 - P2;
   const x = calcX(deltaP, P1);
   const Fgamma = calcFgamma(gamma);
-  const Y = calcY(x, Fgamma, xT);
+
+  // Determine if fittings affect flow
+  const hasFittings = d !== D1 || d !== D2;
 
   // Piping coefficient calculations
   const sumK = calcSumK(d, D1, D2);
-  const Ci = ratedKv * 1.3;
-  const FP = calcFP(sumK, Ci, d);
+
+  // Y for no-fitting case (uses xT)
+  const Y = calcY(x, Fgamma, xT);
+
+  // Flow state without fittings
+  const flowStateNoFitting = determineGasFlowState(x, Fgamma, xT);
+
+  // Step 1: Calculate Kv without fittings first (no FP needed)
+  const kvNoFitting = calcGasKv(Qn, P1, Y, M, Z, T1, x);
+  const kvChokedNoFitting = calcGasKvChoked(Qn, P1, M, Z, T1, xT, Fgamma);
+
+  // Step 2: Use no-fitting Kv as C for FP/xTP (IEC iteration approach)
+  const CforFP = flowStateNoFitting === 'Choked' ? kvChokedNoFitting : kvNoFitting;
+  const FP = calcFP(sumK, CforFP, d);
 
   // Calculate K1 + KB1
   const K1 = 0.5 * Math.pow(1 - Math.pow(d / D1, 2), 2);
   const KB1 = 1 - Math.pow(d / D1, 4);
   const K1_KB1 = K1 + KB1;
 
-  // xTP calculation
-  const xTP = calcXTP(xT, FP, K1_KB1, Ci, d);
+  // xTP calculation using CforFP
+  const xTP = calcXTP(xT, FP, K1_KB1, CforFP, d);
 
-  // Determine if fittings affect flow
-  const hasFittings = d !== D1 || d !== D2;
+  // Y for with-fitting case (uses xTP)
+  const Y_fitting = calcY(x, Fgamma, xTP);
 
-  // Flow state determination
-  const flowStateNoFitting = determineGasFlowState(x, Fgamma, xT);
+  // Flow state with fittings
   const flowStateWithFitting = determineGasFlowStateWithFitting(x, Fgamma, xTP);
 
-  // Calculate Kv using different formulas
-  const kvNoFitting = calcGasKv(Qn, P1, Y, M, Z, T1, x);
-  const kvWithFitting = calcGasKvWithFitting(Qn, P1, Y, FP, M, Z, T1, x);
-  const kvChokedNoFitting = calcGasKvChoked(Qn, P1, M, Z, T1, xT, Fgamma);
+  // Step 3: Calculate Kv with fittings using iterated FP and Y_fitting
+  const kvWithFitting = calcGasKvWithFitting(Qn, P1, Y_fitting, FP, M, Z, T1, x);
   const kvChokedWithFitting = calcGasKvChokedWithFitting(Qn, P1, FP, M, Z, T1, xTP, Fgamma);
   const kvLaminar = FR < 1 ? calcGasKvLaminar(Qn, FR, M, T1, deltaP, P1, P2) : undefined;
 
@@ -298,7 +309,7 @@ export function calculateGasKv(params: GasKvParams): GasKvResult {
       deltaP,
       x,
       Fgamma,
-      Y,
+      Y: hasFittings ? Y_fitting : Y,
       xTP,
       sumK,
       FP,

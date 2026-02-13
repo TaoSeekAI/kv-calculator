@@ -67,11 +67,15 @@ export class KvCalculator {
     // Valve diameter
     const d = input.seatSize || input.DN;
 
-    // Pipe inner diameter
-    // When seatSize equals DN, Excel uses DN as D1/D2 (assuming no reducers)
+    // Pipe inner diameter for fitting correction
+    // When seatSize equals DN: D1=D2=d (no reducers)
+    // When seatSize != DN: use user-specified pipe data, or fall back to DN
+    // (Excel uses DN as pipe inner diameter when no explicit D1w/D1T specified)
     const seatEqualsNominal = !input.seatSize || input.seatSize === input.DN;
-    const D1 = seatEqualsNominal ? d : getPipeInnerDiameter(input.DN, input.D1w, input.D1T);
-    const D2 = seatEqualsNominal ? d : getPipeInnerDiameter(input.DN, input.D2w, input.D2T);
+    const D1 = seatEqualsNominal ? d :
+      (input.D1w && input.D1T ? getPipeInnerDiameter(input.DN, input.D1w, input.D1T) : input.DN);
+    const D2 = seatEqualsNominal ? d :
+      (input.D2w && input.D2T ? getPipeInnerDiameter(input.DN, input.D2w, input.D2T) : input.DN);
 
     // Determine if there are fittings
     const hasFittings = d !== D1 || d !== D2;
@@ -118,6 +122,7 @@ export class KvCalculator {
     let volumeFlowM3h: number | undefined;
     let massFlowKgh: number | undefined;
     let normalFlowNm3h: number | undefined;
+    let gasIntermediateValues: Partial<IntermediateValues> = {};
 
     switch (input.fluidType) {
       case 'Liquid': {
@@ -230,6 +235,17 @@ export class KvCalculator {
         Fgamma = gasResult.intermediate.Fgamma;
         Y = gasResult.intermediate.Y;
         FP = gasResult.intermediate.FP;
+
+        // Propagate gas-specific intermediate values
+        gasIntermediateValues = {
+          xTP: gasResult.intermediate.xTP,
+          kvNoFitting: gasResult.intermediate.kvNoFitting,
+          kvWithFitting: gasResult.intermediate.kvWithFitting,
+          kvChokedNoFitting: gasResult.intermediate.kvChokedNoFitting,
+          kvChokedWithFitting: gasResult.intermediate.kvChokedWithFitting,
+          kvLaminar: gasResult.intermediate.kvLaminar,
+          M,
+        };
         break;
       }
 
@@ -279,17 +295,17 @@ export class KvCalculator {
       warnings.push(openingValidation.warning);
     }
 
-    // 4. Calculate outlet velocity
+    // 4. Calculate outlet velocity (through outlet pipe, use DN not seat diameter)
     let outletVelocity = 0;
     if (input.fluidType === 'Liquid' && volumeFlowM3h) {
-      outletVelocity = calcVelocity(volumeFlowM3h, d);
+      outletVelocity = calcVelocity(volumeFlowM3h, input.DN);
     } else if (input.fluidType === 'Gas' && normalFlowNm3h) {
       // Gas actual volume flow rate
       const actualFlowM3h = normalFlowNm3h * CONSTANTS.STD_PRESSURE * T1 / (P2Abs * CONSTANTS.STD_TEMP);
-      outletVelocity = calcVelocity(actualFlowM3h, d);
+      outletVelocity = calcVelocity(actualFlowM3h, input.DN);
     } else if (input.fluidType === 'Steam' && massFlowKgh) {
       const volumeFlow = massFlowKgh / densityKgM3;
-      outletVelocity = calcVelocity(volumeFlow, d);
+      outletVelocity = calcVelocity(volumeFlow, input.DN);
     }
 
     // 5. Assemble result
@@ -318,7 +334,8 @@ export class KvCalculator {
       sumK,
       Rev,
       FR,
-      lambda
+      lambda,
+      ...gasIntermediateValues
     };
 
     return {
@@ -345,16 +362,26 @@ export class KvCalculator {
    */
   calculateNoise(input: KvInput, result: KvResult): NoiseResult | null {
     try {
-      // Get pipe specification
-      const pipeSpec = PIPE_SPECS[input.DN];
-      if (!pipeSpec) {
-        return null;
+      // Get pipe specification: prefer user-specified D2w/D2T, fallback to PIPE_SPECS[DN]
+      let outerDiameter: number;
+      let wallThickness: number;
+      if (input.D2w && input.D2T) {
+        outerDiameter = input.D2w;
+        wallThickness = input.D2T;
+      } else {
+        const pipeSpec = PIPE_SPECS[input.DN];
+        if (!pipeSpec) {
+          return null;
+        }
+        [outerDiameter, wallThickness] = pipeSpec;
       }
 
-      const [outerDiameter, wallThickness] = pipeSpec;
-      const Di = outerDiameter - 2 * wallThickness;  // Pipe inner diameter mm
       const tp = wallThickness;  // Wall thickness mm
       const d = input.seatSize || input.DN;  // Seat diameter mm
+      // Noise pipe inner diameter: when seat size equals DN (no reducer),
+      // use d as Di to match Excel behavior; otherwise use actual pipe ID
+      const seatEqualsNominal = !input.seatSize || input.seatSize === input.DN;
+      const Di = seatEqualsNominal ? d : (outerDiameter - 2 * wallThickness);
 
       // Calculate mass flow
       let massFlow = result.intermediate.massFlowKgh || 0;
@@ -373,6 +400,17 @@ export class KvCalculator {
         massFlow = result.intermediate.volumeFlowM3h * result.intermediate.densityKgM3;
       }
 
+      // For gas/steam noise calculation, convert standard density to operating density
+      // ρ_operating = ρ_standard × P1 × T_std / (P_std × T1)
+      let noiseDensity = result.intermediate.densityKgM3;
+      if ((input.fluidType === 'Gas' || input.fluidType === 'Steam') && input.densityUnit === 'Kg/Nm3') {
+        noiseDensity = convertGasDensityToActual(
+          result.intermediate.densityKgM3,
+          result.intermediate.P1Abs,
+          result.intermediate.T1
+        );
+      }
+
       // Build noise calculation input
       const noiseInput: NoiseInput = {
         fluidType: input.fluidType === 'Steam' ? 'Steam' : (input.fluidType === 'Gas' ? 'Gas' : 'Liquid'),
@@ -382,12 +420,12 @@ export class KvCalculator {
         T1: result.intermediate.T1,
         massFlow,
         volumeFlow: result.intermediate.volumeFlowM3h,
-        density: result.intermediate.densityKgM3,
+        density: noiseDensity,
         density2: input.fluidType === 'Gas'
-          ? result.intermediate.densityKgM3 * Math.pow(result.intermediate.P2Abs / result.intermediate.P1Abs, 1 / (input.gamma || 1.4))
+          ? noiseDensity * Math.pow(result.intermediate.P2Abs / result.intermediate.P1Abs, 1 / (input.gamma || 1.4))
           : undefined,
         gamma: input.gamma || CONSTANTS.DEFAULT.GAMMA,
-        molecularWeight: input.molecularWeight,
+        molecularWeight: input.noiseMolecularWeight || result.intermediate.M || input.molecularWeight,
         Pv: result.intermediate.Pv,
         Kv: result.calculatedKv,
         Cv: result.calculatedCv,

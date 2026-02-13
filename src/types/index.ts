@@ -91,7 +91,8 @@ export interface KvInput {
   viscosityType?: ViscosityType;
 
   // Gas-specific parameters
-  molecularWeight?: number; // Molecular weight M
+  molecularWeight?: number; // Molecular weight M (for Kv calculation)
+  noiseMolecularWeight?: number; // Molecular weight for noise calculation (from fluid database)
   Z?: number;               // Compressibility factor
   gamma?: number;           // Specific heat ratio γ
 
@@ -154,6 +155,13 @@ export interface IntermediateValues {
   x?: number;               // Pressure ratio ΔP/P1
   Fgamma?: number;          // Specific heat ratio factor γ/1.4
   Y?: number;               // Expansion factor
+  xTP?: number;             // Corrected xT with fittings
+  kvNoFitting?: number;     // Gas Kv without fittings
+  kvWithFitting?: number;   // Gas Kv with fittings
+  kvChokedNoFitting?: number; // Gas choked Kv without fittings
+  kvChokedWithFitting?: number; // Gas choked Kv with fittings
+  kvLaminar?: number;       // Gas laminar Kv
+  M?: number;               // Molecular weight
 
   // Piping coefficients
   D1?: number;              // Upstream pipe inner diameter mm

@@ -83,8 +83,8 @@ export function determineGasFlowState(
   const alpha = Pvcc_Pa / P2C_Pa;
 
   // P2B - 断点出口压力 (E43)
-  // P2B = P1/22/α * (1/γ)^(γ/(γ-1))
-  const P2B_Pa = (P1_Pa / 22 / alpha) * Math.pow(1 / gamma, gamma / (gamma - 1));
+  // P2B = (P1/α) * (1/γ)^(γ/(γ-1))
+  const P2B_Pa = (P1_Pa / alpha) * Math.pow(1 / gamma, gamma / (gamma - 1));
 
   // P2CE - 声效系数恒定的出口压力 (E44)
   // P2CE = P1 / 22 / α
@@ -447,11 +447,20 @@ export function calculateGasNoise(input: NoiseInput): NoiseResult {
   // 计算入口声速
   const c1 = calculateInletSoundSpeed(gamma, T1, M);
 
-  // 计算缩流断面压力
-  const Pvc = calculateVenaContractaPressure(P1, P2, FL, state, Pvcc);
+  // 始终用 State I 公式计算 Pvc (E39: 公用计算部分，不依赖状态)
+  const Pvc = P1 - (P1 - P2) / (FL * FL);
 
-  // 计算缩流断面马赫数 (State I)
-  const Mvc = calculateVenaContractaMach(P1, Pvc, gamma, state);
+  // 缩流断面温度 Tvc (E53) 和声速 Cvc (E54) — 始终用 Pvc 计算
+  const xPvc = Math.pow(Pvc / P1, (gamma - 1) / gamma);
+  const Tvc = T1 * xPvc;
+  const Cvc = Math.sqrt(gamma * NOISE_CONSTANTS.R * Tvc / M);
+
+  // 缩流断面流速 Uvc (E51) — 能量公式，使用实际密度 P1/ρ1
+  const P1_Pa = P1 * 1000;  // KPa → Pa
+  const Uvc = Math.sqrt(2 * gamma / (gamma - 1) * (1 - xPvc) * P1_Pa / rho1);
+
+  // 缩流断面马赫数 Mvc (E55) = Uvc / Cvc
+  const Mvc = Uvc / Cvc;
 
   // 计算自由膨胀射流马赫数 Mj (State II-V)
   let Mj: number;
@@ -461,22 +470,15 @@ export function calculateGasNoise(input: NoiseInput): NoiseResult {
     Mj = calculateJetMachNumber(P1, P2, alpha, gamma);
   }
 
-  // 计算缩流断面流速
-  const Uvc = calculateVenaContractaVelocity(Mvc, c1, P1, Pvc, gamma);
-
   // 计算出口密度 (Excel E83使用等温过程)
   const rho2 = calculateOutletDensity(rho1, P2, P1);
 
   // 计算出口声速 (Excel假设等温过程，C2=C1)
   const c2 = calculateOutletSoundSpeed(c1);
 
-  // 计算缩流断面温度 (E53/E61)
-  const Tvc = state === 'State I'
-    ? T1 * Math.pow(Pvc / P1, (gamma - 1) / gamma)  // 亚音速
-    : 2 * T1 / (1 + gamma);  // 临界流
-
-  // 计算缩流断面声速 (E54/E62)
-  const Cvc = Math.sqrt(gamma * NOISE_CONSTANTS.R * Tvc / M);
+  // State II-V: 临界流缩流断面温度 Tvcc (E61) 和声速 Cvcc (E62)
+  const Tvcc = 2 * T1 / (1 + gamma);
+  const Cvcc = Math.sqrt(gamma * NOISE_CONSTANTS.R * Tvcc / M);
 
   // 计算出口流速
   const U2 = calculateOutletVelocity(massFlow, rho2, Di);
@@ -494,7 +496,6 @@ export function calculateGasNoise(input: NoiseInput): NoiseResult {
   if (state === 'State I') {
     Wm = calculateMechanicalPower(massFlow, Uvc);
   } else {
-    const Cvcc = Math.sqrt(gamma * NOISE_CONSTANTS.R * (2 * T1 / (1 + gamma)) / M);
     Wm = (massFlow / 3600) * Cvcc * Cvcc / 2;
   }
 
@@ -523,15 +524,15 @@ export function calculateGasNoise(input: NoiseInput): NoiseResult {
   if (state === 'State I') {
     fp = 0.2 * Uvc / Dj;  // E59
   } else if (state === 'State II' || state === 'State III') {
-    fp = 0.2 * Mj * Cvc / Dj;  // E68/E72
+    fp = 0.2 * Mj * Cvcc / Dj;  // E68/E72 使用Cvcc
   } else {
     // State IV/V: fp = 0.35*Cvcc/(1.25*Dj*sqrt(Mj²-1)) (E76/E81)
     const denominator = 1.25 * Dj * Math.sqrt(Math.max(0.01, Mj * Mj - 1));
-    fp = 0.35 * Cvc / denominator;
+    fp = 0.35 * Cvcc / denominator;
   }
 
-  // 确保频率有效
-  fp = Math.max(100, Math.min(10000, fp));
+  // 确保频率有效 (不截断上限，Excel可达42000+Hz)
+  fp = Math.max(100, fp);
 
   // 管道内径转为m
   const Di_m = Di / 1000;
@@ -556,8 +557,9 @@ export function calculateGasNoise(input: NoiseInput): NoiseResult {
 
   // 距离修正 (E98)
   // LpAe,1m = Lpae - 10*LOG10((Di+2*tp+2)/(Di+2*tp))
+  // +2 为管壁外1m处的圆柱几何扩展 (2×1m距离，单位：米)
   const tp_m = tp / 1000;
-  const distanceCorrection = 10 * Math.log10((Di_m + 2 * tp_m + 0.002) / (Di_m + 2 * tp_m));
+  const distanceCorrection = 10 * Math.log10((Di_m + 2 * tp_m + 2) / (Di_m + 2 * tp_m));
   const Lpe = Lpae - distanceCorrection;
 
   // 计算A加权校正
@@ -599,6 +601,7 @@ export function calculateGasNoise(input: NoiseInput): NoiseResult {
     Wa,
     Lpi,
     TL,
+    Lpae,
     Lpe,
     fp,
     deltaLA,

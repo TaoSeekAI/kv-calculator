@@ -32,8 +32,8 @@ export const NOISE_CONSTANTS = {
   AIR_SOUND_SPEED: 343,
 
   // ===== 气体常数 =====
-  /** 通用气体常数 J/(mol·K) */
-  R: 8314.46,
+  /** 通用气体常数 J/(kmol·K) — 匹配Excel E28 */
+  R: 8314,
 
   // ===== 声效系数 =====
   /** 参考声效系数 (气体) */

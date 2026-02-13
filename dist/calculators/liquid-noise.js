@@ -2,7 +2,7 @@
  * 液体噪音计算模块
  * 基于 IEC 60534-8-4 标准
  */
-import { NOISE_CONSTANTS, getPipeMaterialDensity } from './noise/constants.js';
+import { NOISE_CONSTANTS, getPipeMaterialDensity, calculateAWeighting } from './noise/constants.js';
 /**
  * 判定空化状态
  * @param xF 压差比 (P1-P2)/(P1-Pv)
@@ -149,8 +149,8 @@ function getSoundPowerRatio(valveType = 'standard') {
  */
 function calculateSoundPower(etaTurb, etaCav, Wm, rw, cavitationState) {
     if (cavitationState === 'No Cavitation') {
-        // Pure turbulent flow
-        return etaTurb * Wm;
+        // Pure turbulent flow (rw included per IEC 60534-8-4)
+        return etaTurb * Wm * rw;
     }
     else {
         // Cavitating flow
@@ -307,7 +307,9 @@ export function calculateLiquidNoise(input) {
     // 计算压差比 xF (E28)
     const xF = (P1 - P2) / (P1 - Pv);
     // 计算空化起始压差比 xFz (E35)
-    const xFz = input.xFz || calculateXFz(Cv || Kv, Fd, FL);
+    // N34=1 is for Kv system, so use Kv (not Cv)
+    const C = Kv || Cv;
+    const xFz = input.xFz || calculateXFz(C, Fd, FL);
     // 入口压力修正的xFzp (E38)
     // xFzp = xFz * (6×10⁵/P1)^0.125
     const P1_Pa = P1 * 1000; // KPa -> Pa
@@ -324,7 +326,7 @@ export function calculateLiquidNoise(input) {
             cavitationState,
             intermediate: {
                 deltaPc: 0, Uvc: 0, cL, etaTurb: 0, etaCav: 0, eta: 0,
-                Wm: 0, Wa: 0, rw: 0.25, Lpi: 0, TL: 0, Lpe: 0, fp: 0, xF, xFz
+                Wm: 0, Wa: 0, rw: 0.25, Lpi: 0, TL: 0, Lpae: 0, Lpe: 0, fp: 0, xF, xFz
             },
             peakFrequency: 0,
             warnings
@@ -353,9 +355,10 @@ export function calculateLiquidNoise(input) {
     const N14 = NOISE_CONSTANTS.N14 || 0.0049;
     const d_m = d / 1000; // mm -> m
     const d0 = input.d / 1000; // 阀座直径 m
-    const Dj = N14 * Fd * Math.sqrt((Cv || Kv) * FL);
+    // N14=0.0049 is for Kv system, use Kv (not Cv)
+    const Dj = N14 * Fd * Math.sqrt(C * FL);
     // 计算Strouhal数 (E51)
-    const Nstr = calculateStrouhalNumber(FL, Cv || Kv, Fd, xFzp, d_m, d0, P1_Pa, Pv * 1000);
+    const Nstr = calculateStrouhalNumber(FL, C, Fd, xFzp, d_m, d0, P1_Pa, Pv * 1000);
     // 计算峰值频率 (E52/E53)
     const fpTurb = calculatePeakFrequencyTurbulent(Nstr, Uvc, Dj);
     const fpCav = isCavitation ? calculatePeakFrequencyCavitation(fpTurb, xF, xFzp) : fpTurb;
@@ -371,11 +374,14 @@ export function calculateLiquidNoise(input) {
     const TL = isCavitation
         ? calculateCavitationTransmissionLoss(TL_turb, fpTurb, fpCav, etaTurb, etaCav)
         : TL_turb;
+    // 管道外A加权声压级
+    const aWeighting = calculateAWeighting(fpValid);
+    const Lpae = Lpi + TL + aWeighting;
     // 距离修正 (E58/E60/E69)
-    // Lpe,1m = Lpi + TL - 10*LOG10((Di+2*tp+2)/(Di+2*tp))
+    // Lpe,1m = Lpae - 10*LOG10((Di+2*tp+2)/(Di+2*tp))
     const tp_m = tp / 1000;
-    const distanceCorrection = 10 * Math.log10((Di_m + 2 * tp_m + 0.002) / (Di_m + 2 * tp_m));
-    const Lpe = Lpi + TL - distanceCorrection;
+    const distanceCorrection = 10 * Math.log10((Di_m + 2 * tp_m + 2) / (Di_m + 2 * tp_m));
+    const Lpe = Lpae - distanceCorrection;
     // 最终噪音级
     let noiseLevel = Lpe;
     // 限制范围
@@ -403,6 +409,7 @@ export function calculateLiquidNoise(input) {
         rw,
         Lpi,
         TL,
+        Lpae,
         Lpe,
         fp: fpValid,
         xF,

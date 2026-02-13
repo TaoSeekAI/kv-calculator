@@ -35,6 +35,7 @@ export interface KvInput {
     viscosityUnit?: ViscosityUnit;
     viscosityType?: ViscosityType;
     molecularWeight?: number;
+    noiseMolecularWeight?: number;
     Z?: number;
     gamma?: number;
     Pc?: number;
@@ -73,6 +74,13 @@ export interface IntermediateValues {
     x?: number;
     Fgamma?: number;
     Y?: number;
+    xTP?: number;
+    kvNoFitting?: number;
+    kvWithFitting?: number;
+    kvChokedNoFitting?: number;
+    kvChokedWithFitting?: number;
+    kvLaminar?: number;
+    M?: number;
     D1?: number;
     D2?: number;
     FP: number;
