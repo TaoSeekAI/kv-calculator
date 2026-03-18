@@ -551,15 +551,15 @@ export function calculateGasNoise(input: NoiseInput): NoiseResult {
   const M2 = Math.min(M2_calc, 0.8);
   const Lg = M2 > 0 ? 16 * Math.log10(1 / (1 - M2)) : 0;
 
-  // 计算外部噪音级 (E97)
-  // Lpae = 5 + Lpi + TL + Lg
-  const Lpae = 5 + Lpi + TL + Lg;
-
-  // 距离修正 (E98)
-  // LpAe,1m = Lpae - 10*LOG10((Di+2*tp+2)/(Di+2*tp))
-  // +2 为管壁外1m处的圆柱几何扩展 (2×1m距离，单位：米)
+  // 计算外部噪音级
+  // Excel公式 (E97/E98):
+  //   Lpae = 5 + Lpi + TL + Lg
+  //   Lpe = Lpae - 10*LOG10((Do_m+2)/Do_m)  (cylindrical radiation at 1m)
   const tp_m = tp / 1000;
-  const distanceCorrection = 10 * Math.log10((Di_m + 2 * tp_m + 2) / (Di_m + 2 * tp_m));
+  const outerDiameter = Di_m + 2 * tp_m;
+  const distanceCorrection = 10 * Math.log10((outerDiameter + 2) / outerDiameter);
+  const geometryTerm = 10 * Math.log10(Di_m / outerDiameter);  // IEC standard term (kept for intermediate)
+  const Lpae = 5 + Lpi + TL + Lg;
   const Lpe = Lpae - distanceCorrection;
 
   // 计算A加权校正
