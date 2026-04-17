@@ -33,6 +33,7 @@ export interface NoiseInput {
     tp: number;
     pipeMaterial?: PipeMaterial;
     d: number;
+    dValve?: number;
 }
 /**
  * Gas Noise Intermediate Calculation Values

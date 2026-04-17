@@ -64,6 +64,7 @@ export interface NoiseInput {
 
   // Valve diameter
   d: number;               // Seat diameter mm
+  dValve?: number;         // Valve body/nominal diameter mm (for reduced trim, defaults to d)
 }
 
 /**

@@ -36,19 +36,16 @@ export class KvCalculator {
             errors.push('Inlet pressure must be greater than outlet pressure');
         // Density conversion
         const densityKgM3 = convertDensityToKgM3(input.density, input.densityUnit);
-        // Valve diameter
+        // Valve seat diameter (used in noise, Fd, Reynolds calculations)
         const d = input.seatSize || input.DN;
-        // Pipe inner diameter for fitting correction
-        // When seatSize equals DN: D1=D2=d (no reducers)
-        // When seatSize != DN: use user-specified pipe data, or fall back to DN
-        // (Excel uses DN as pipe inner diameter when no explicit D1w/D1T specified)
-        const seatEqualsNominal = !input.seatSize || input.seatSize === input.DN;
-        const D1 = seatEqualsNominal ? d :
-            (input.D1w && input.D1T ? getPipeInnerDiameter(input.DN, input.D1w, input.D1T) : input.DN);
-        const D2 = seatEqualsNominal ? d :
-            (input.D2w && input.D2T ? getPipeInnerDiameter(input.DN, input.D2w, input.D2T) : input.DN);
-        // Determine if there are fittings
-        const hasFittings = d !== D1 || d !== D2;
+        // Fitting correction uses DN (valve body diameter), not seatSize.
+        // Excel: sumK/FP/FLP use DN vs pipe inner diameter.
+        // When no pipe specs are provided, D1=D2=DN → no fittings.
+        const DN = input.DN;
+        const D1 = input.D1w && input.D1T ? getPipeInnerDiameter(DN, input.D1w, input.D1T) : DN;
+        const D2 = input.D2w && input.D2T ? getPipeInnerDiameter(DN, input.D2w, input.D2T) : DN;
+        // Fittings exist when pipe inner diameter differs from valve DN
+        const hasFittings = DN !== D1 || DN !== D2;
         // Viscosity conversion
         const kinematicViscosity = input.viscosity
             ? convertViscosityToM2S(input.viscosity, input.viscosityUnit || 'cP', input.viscosityType || 'Viscosity', densityKgM3)
@@ -64,11 +61,11 @@ export class KvCalculator {
         let turbulenceState = 'Turbulent';
         let fluidState;
         let usedFormula = '';
-        // Intermediate values
-        const sumK = calcSumK(d, D1, D2);
+        // Intermediate values — fitting correction uses DN, not seatSize
+        const sumK = calcSumK(DN, D1, D2);
         const Ci = input.ratedKv * 1.3;
-        let FP = calcFP(sumK, Ci, d);
-        let FLP = calcFLP(input.FL, sumK, Ci, d);
+        let FP = calcFP(sumK, Ci, DN);
+        let FLP = calcFLP(input.FL, sumK, Ci, DN);
         let Rev = 0;
         let FR = 1;
         let lambda = 0;
@@ -119,7 +116,7 @@ export class KvCalculator {
                 FR = reynoldsResult.FR;
                 lambda = reynoldsResult.lambda;
                 turbulenceState = reynoldsResult.turbulenceState;
-                // Liquid Kv calculation
+                // Liquid Kv calculation — fitting correction uses DN
                 const liquidResult = calculateLiquidKv({
                     Q: volumeFlowM3h,
                     P1: P1Abs,
@@ -128,7 +125,7 @@ export class KvCalculator {
                     Pv,
                     Pc,
                     FL: input.FL,
-                    d,
+                    d: DN,
                     D1,
                     D2,
                     Fd,
@@ -146,15 +143,16 @@ export class KvCalculator {
                 break;
             }
             case 'Gas': {
-                // Gas standard density calculation
+                // Gas standard density: convert actual Kg/m3 → standard Kg/Nm3
+                // Excel formula: ρ_Nm3 = ρ_actual × T1 × 101.325 / P1 / 273.15
                 const rhoN = input.densityUnit === 'Kg/Nm3'
                     ? input.density
-                    : convertGasDensityToActual(input.density, CONSTANTS.STD_PRESSURE, CONSTANTS.STD_TEMP);
+                    : input.density * T1 * CONSTANTS.STD_PRESSURE / (P1Abs * CONSTANTS.STD_TEMP);
                 // Flow conversion
                 normalFlowNm3h = convertGasFlowToNm3h(input.flowRate, input.flowUnit, rhoN, P1Abs, T1);
                 // Molecular weight
                 const M = input.molecularWeight || (rhoN * 22.4);
-                // Gas Kv calculation
+                // Gas Kv calculation — fitting correction uses DN
                 const gasResult = calculateGasKv({
                     Qn: normalFlowNm3h,
                     P1: P1Abs,
@@ -164,7 +162,7 @@ export class KvCalculator {
                     Z,
                     gamma,
                     xT: input.XT || 0.72,
-                    d,
+                    d: DN,
                     D1,
                     D2,
                     ratedKv: input.ratedKv
@@ -191,7 +189,7 @@ export class KvCalculator {
             case 'Steam': {
                 // Flow conversion
                 massFlowKgh = convertSteamFlowToKgh(input.flowRate, input.flowUnit, densityKgM3);
-                // Steam Kv calculation
+                // Steam Kv calculation — fitting correction uses DN
                 const steamResult = calculateSteamKv({
                     W: massFlowKgh,
                     P1: P1Abs,
@@ -200,7 +198,7 @@ export class KvCalculator {
                     rho1: densityKgM3,
                     gamma,
                     xT: input.XT || 0.72,
-                    d,
+                    d: DN,
                     D1,
                     D2,
                     ratedKv: input.ratedKv
@@ -314,9 +312,10 @@ export class KvCalculator {
             // For gas, calculate mass flow from standard volume flow
             if (input.fluidType === 'Gas' && result.intermediate.normalFlowNm3h) {
                 // At standard density: massFlow = Qn * rhoN
+                // Convert actual Kg/m3 → standard Kg/Nm3: ρ_Nm3 = ρ_actual × T1 × STD_P / (P1 × STD_T)
                 const rhoN = input.densityUnit === 'Kg/Nm3'
                     ? input.density
-                    : input.density * CONSTANTS.STD_TEMP / result.intermediate.T1 * result.intermediate.P1Abs / CONSTANTS.STD_PRESSURE;
+                    : input.density * result.intermediate.T1 * CONSTANTS.STD_PRESSURE / (result.intermediate.P1Abs * CONSTANTS.STD_TEMP);
                 massFlow = result.intermediate.normalFlowNm3h * rhoN;
             }
             // For liquid, calculate from volume flow
@@ -329,6 +328,13 @@ export class KvCalculator {
             if ((input.fluidType === 'Gas' || input.fluidType === 'Steam') && input.densityUnit === 'Kg/Nm3') {
                 noiseDensity = convertGasDensityToActual(result.intermediate.densityKgM3, result.intermediate.P1Abs, result.intermediate.T1);
             }
+            // Determine molecular weight for noise calculation
+            // Steam: M = 18.015 (water vapor)
+            // Gas: from intermediate (calculated as rhoN * 22.4) or user input
+            const noiseM = input.noiseMolecularWeight
+                || result.intermediate.M
+                || input.molecularWeight
+                || (input.fluidType === 'Steam' ? 18.015 : undefined);
             // Build noise calculation input
             const noiseInput = {
                 fluidType: input.fluidType === 'Steam' ? 'Steam' : (input.fluidType === 'Gas' ? 'Gas' : 'Liquid'),
@@ -343,7 +349,7 @@ export class KvCalculator {
                     ? noiseDensity * Math.pow(result.intermediate.P2Abs / result.intermediate.P1Abs, 1 / (input.gamma || 1.4))
                     : undefined,
                 gamma: input.gamma || CONSTANTS.DEFAULT.GAMMA,
-                molecularWeight: input.noiseMolecularWeight || result.intermediate.M || input.molecularWeight,
+                molecularWeight: noiseM,
                 Pv: result.intermediate.Pv,
                 Kv: result.calculatedKv,
                 Cv: result.calculatedCv,
@@ -355,6 +361,7 @@ export class KvCalculator {
                 Di,
                 tp,
                 d,
+                dValve: input.DN,
                 pipeMaterial: 'steel'
             };
             // Select noise calculation method based on fluid type

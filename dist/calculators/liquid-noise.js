@@ -353,7 +353,7 @@ export function calculateLiquidNoise(input) {
     const Wa = calculateSoundPower(etaTurb, etaCav, Wm, rw, cavitationState);
     // 计算射流直径 Dj (E39)
     const N14 = NOISE_CONSTANTS.N14 || 0.0049;
-    const d_m = d / 1000; // mm -> m
+    const d_m = (input.dValve || d) / 1000; // 阀体直径 mm -> m (IEC 60534-8-4: valve body diameter)
     const d0 = input.d / 1000; // 阀座直径 m
     // N14=0.0049 is for Kv system, use Kv (not Cv)
     const Dj = N14 * Fd * Math.sqrt(C * FL);
@@ -364,24 +364,45 @@ export function calculateLiquidNoise(input) {
     const fpCav = isCavitation ? calculatePeakFrequencyCavitation(fpTurb, xF, xFzp) : fpTurb;
     const fp = isCavitation ? fpCav : fpTurb;
     // 确保频率有效
-    const fpValid = Math.max(100, Math.min(20000, fp));
+    const fpTurbValid = Math.max(100, Math.min(20000, fpTurb));
+    const fpCavValid = Math.max(100, Math.min(20000, fpCav));
+    const fpValid = isCavitation ? fpCavValid : fpTurbValid;
     // 管道内径转为m
     const Di_m = Di / 1000;
     // 计算内部声压级 (E50)
     const Lpi = calculateInternalNoiseLevel(Wa, rhoL, cL, Di_m);
-    // 计算透射损失 (E57/E59)
-    const TL_turb = calculateTransmissionLoss(tp, fpValid, Di, pipeMaterial);
-    const TL = isCavitation
-        ? calculateCavitationTransmissionLoss(TL_turb, fpTurb, fpCav, etaTurb, etaCav)
-        : TL_turb;
-    // 管道外A加权声压级
-    const aWeighting = calculateAWeighting(fpValid);
-    const Lpae = Lpi + TL + aWeighting;
-    // 距离修正 (E58/E60/E69)
-    // Lpe,1m = Lpae - 10*LOG10((Di+2*tp+2)/(Di+2*tp))
     const tp_m = tp / 1000;
     const distanceCorrection = 10 * Math.log10((Di_m + 2 * tp_m + 2) / (Di_m + 2 * tp_m));
-    const Lpe = Lpae - distanceCorrection;
+    let TL;
+    let Lpe;
+    if (isCavitation) {
+        // 空化噪音: Excel E69 方法 — 在固定频率 fi=8000Hz 处评估
+        const fi = 8000;
+        const rhoP = getPipeMaterialDensity(pipeMaterial);
+        const cp = NOISE_CONSTANTS.CP_PIPE;
+        const rho0 = NOISE_CONSTANTS.RHO_0;
+        const c0 = NOISE_CONSTANTS.C0;
+        const fr = cp / (Math.PI * Di_m);
+        const TLfr = -10 - 10 * Math.log10((cp * rhoP * tp_m) / (rho0 * c0 * Di_m));
+        // 频率分布函数 (E62/E63)
+        const Fturb_fi = -10 * Math.log10(0.25 * Math.pow(fi / fpTurb, 3) + Math.pow(fi / fpTurb, -1)) - 3.1;
+        const Fcav_fi = -10 * Math.log10(0.25 * Math.pow(fi / fpCav, 1.5) + Math.pow(fi / fpCav, -1.5)) - 3.5;
+        // Lpi at fi (E65)
+        const ratioTurb = etaTurb / (etaTurb + etaCav);
+        const ratioCav = etaCav / (etaTurb + etaCav);
+        const Lpi_fi = Lpi + 10 * Math.log10(ratioTurb * Math.pow(10, 0.1 * Fturb_fi) + ratioCav * Math.pow(10, 0.1 * Fcav_fi));
+        // TL at fi (E67/E68)
+        const deltaTL_fi = -20 * Math.log10(fr / fi + Math.pow(fi / fr, 1.5));
+        TL = TLfr + deltaTL_fi;
+        Lpe = Lpi_fi + TL - distanceCorrection;
+    }
+    else {
+        // 紊流噪音: Excel E58 方法 — 峰值频率 + A加权
+        const TL_turb = calculateTransmissionLoss(tp, fpTurbValid, Di, pipeMaterial);
+        TL = TL_turb;
+        const aWeighting = calculateAWeighting(fpTurbValid);
+        Lpe = Lpi + TL + aWeighting - distanceCorrection;
+    }
     // 最终噪音级
     let noiseLevel = Lpe;
     // 限制范围
@@ -409,7 +430,7 @@ export function calculateLiquidNoise(input) {
         rw,
         Lpi,
         TL,
-        Lpae,
+        Lpae: Lpi + TL,
         Lpe,
         fp: fpValid,
         xF,
